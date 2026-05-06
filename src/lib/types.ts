@@ -45,13 +45,17 @@ export interface LifeAdminMessage {
   extractedFields: ExtractedField[];
   financialImpact?: number;
   documentSaveRecommended?: boolean;
+  documentSavedAt?: string;
   needsReply?: boolean;
   appointmentStart?: string;
+  snoozedUntil?: string;
+  taskCreatedAt?: string;
+  updatedAt?: string;
 }
 
 export interface LifeAdminTask {
   id: string;
-  messageId: string;
+  messageId?: string;
   title: string;
   category: LifeAdminCategory;
   dueDate?: string;
@@ -80,3 +84,83 @@ export interface BriefingSummary {
 }
 
 export type StatusMap = Record<string, LifeAdminStatus>;
+
+export type LifeAdminAction =
+  | "mark_reviewed"
+  | "mark_complete"
+  | "ignore"
+  | "snooze"
+  | "save_document"
+  | "create_task";
+
+export type DocumentStatus = "queued" | "saved" | "archived";
+
+export interface DocumentRecord {
+  id: string;
+  sourceMessageId: string;
+  title: string;
+  category: LifeAdminCategory;
+  source: LifeAdminSource;
+  status: DocumentStatus;
+  savedAt: string;
+  notes?: string;
+}
+
+export interface ManualTask {
+  id: string;
+  sourceMessageId?: string;
+  title: string;
+  category: LifeAdminCategory;
+  dueDate?: string;
+  priority: Priority;
+  status: LifeAdminStatus;
+  suggestedAction: string;
+  createdAt: string;
+  updatedAt: string;
+  snoozedUntil?: string;
+}
+
+export type IntegrationProvider = "gmail" | "google-calendar" | "plaid" | "health";
+
+export type IntegrationStatus = "not_connected" | "connected" | "paused" | "error";
+
+export interface IntegrationConnection {
+  provider: IntegrationProvider;
+  label: string;
+  status: IntegrationStatus;
+  permissionScopes: string[];
+  lastSyncAt?: string;
+  connectedAt?: string;
+  notes: string;
+}
+
+export interface UserSettings {
+  disabledCategories: LifeAdminCategory[];
+  approvalRequiredFor: {
+    sendingMessages: boolean;
+    payments: boolean;
+    cancellations: boolean;
+  };
+  weeklyBriefingDay: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+  timezone: string;
+}
+
+export type AuditEventType =
+  | "status_updated"
+  | "item_snoozed"
+  | "document_saved"
+  | "task_created"
+  | "task_updated"
+  | "settings_updated"
+  | "integration_updated"
+  | "store_reset";
+
+export interface AuditEvent {
+  id: string;
+  type: AuditEventType;
+  entityType: "message" | "task" | "document" | "settings" | "integration" | "store";
+  entityId: string;
+  summary: string;
+  createdAt: string;
+  metadata?: Record<string, string | number | boolean | null>;
+}

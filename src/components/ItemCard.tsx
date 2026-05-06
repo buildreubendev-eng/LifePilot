@@ -10,7 +10,7 @@ export function ItemCard({ item, task }: { item?: LifeAdminMessage; task?: LifeA
     return null;
   }
 
-  const href = item ? `/inbox/${item.id}` : `/inbox/${task?.messageId}`;
+  const href = item ? `/inbox/${item.id}` : task?.messageId ? `/inbox/${task.messageId}` : "/tasks";
 
   return (
     <Link

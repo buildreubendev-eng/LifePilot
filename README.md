@@ -35,10 +35,21 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - `GET /api/life-admin/items`: list parsed life-admin items.
 - `GET /api/life-admin/items/:id`: fetch one parsed item.
 - `PATCH /api/life-admin/items/:id`: update item status with `new`, `reviewed`, `completed`, or `ignored`.
+- `POST /api/life-admin/items/:id/action`: perform `mark_reviewed`, `mark_complete`, `ignore`, `snooze`, `save_document`, or `create_task`.
 - `GET /api/life-admin/tasks`: list generated and prioritized tasks.
+- `POST /api/life-admin/tasks`: create a manual task.
+- `PATCH /api/life-admin/tasks/:id`: update a manual task.
 - `GET /api/life-admin/dashboard`: return Life Admin Score, priority tasks, and dashboard counts.
 - `GET /api/life-admin/briefing`: return weekly briefing summary.
-- `POST /api/life-admin/reset`: reset mock status changes.
+- `GET /api/life-admin/documents`: list saved document records.
+- `GET /api/life-admin/settings`: read privacy and briefing settings.
+- `PATCH /api/life-admin/settings`: update disabled categories, approval requirements, briefing day, or timezone.
+- `GET /api/life-admin/integrations`: list future connector states.
+- `PATCH /api/life-admin/integrations/:provider`: update future connector state for Gmail, Calendar, Plaid, or health.
+- `GET /api/life-admin/audit`: list backend audit events.
+- `POST /api/life-admin/reset`: reset the local MVP data store back to the mock seed state.
+
+Local MVP persistence is stored in `.data/plos-store.json`, which is ignored by Git. This keeps the backend stateful without introducing a database dependency before the integration model settles.
 
 ## Run The App
 

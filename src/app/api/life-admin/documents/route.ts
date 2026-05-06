@@ -1,11 +1,10 @@
 import { ok, serverError } from "@/server/apiResponses";
 import { getLifeAdminService } from "@/server/lifeAdminService";
 
-export async function POST() {
+export async function GET() {
   try {
-    await getLifeAdminService().resetStore();
-    const items = await getLifeAdminService().listMessages();
-    return ok({ items });
+    const documents = await getLifeAdminService().listDocuments();
+    return ok({ documents });
   } catch (error) {
     return serverError(error);
   }
