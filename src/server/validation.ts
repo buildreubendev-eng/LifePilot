@@ -1,4 +1,4 @@
-import type { ApprovalActionType, ApprovalStatus, IntegrationProvider, LifeAdminCategory, Priority } from "@/lib/types";
+import type { ApprovalActionType, ApprovalStatus, IntegrationProvider, LifeAdminCategory, Priority, RawMessageProvider } from "@/lib/types";
 
 export const lifeAdminCategories: LifeAdminCategory[] = [
   "bill",
@@ -22,6 +22,8 @@ export const approvalActionTypes: ApprovalActionType[] = ["send_message", "make_
 
 export const approvalReviewStatuses: Array<Exclude<ApprovalStatus, "pending">> = ["approved", "rejected"];
 
+export const rawMessageProviders: RawMessageProvider[] = ["gmail", "google-calendar", "plaid", "health", "manual"];
+
 export function isLifeAdminCategory(value: unknown): value is LifeAdminCategory {
   return typeof value === "string" && lifeAdminCategories.includes(value as LifeAdminCategory);
 }
@@ -40,4 +42,8 @@ export function isApprovalActionType(value: unknown): value is ApprovalActionTyp
 
 export function isApprovalReviewStatus(value: unknown): value is Exclude<ApprovalStatus, "pending"> {
   return typeof value === "string" && approvalReviewStatuses.includes(value as Exclude<ApprovalStatus, "pending">);
+}
+
+export function isRawMessageProvider(value: unknown): value is RawMessageProvider {
+  return typeof value === "string" && rawMessageProviders.includes(value as RawMessageProvider);
 }

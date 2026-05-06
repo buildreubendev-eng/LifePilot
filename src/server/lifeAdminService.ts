@@ -8,6 +8,7 @@ import type {
   DocumentRecord,
   IntegrationConnection,
   IntegrationProvider,
+  IngestionRun,
   LifeAdminAction,
   LifeAdminCategory,
   LifeAdminMessage,
@@ -15,9 +16,11 @@ import type {
   LifeAdminTask,
   ManualTask,
   Priority,
+  RawLifeAdminMessage,
   UserSettings,
 } from "@/lib/types";
 import { getLifeAdminRepository, type LifeAdminRepository, type MessageFilters } from "@/server/lifeAdminRepository";
+import { parseRawLifeAdminMessage } from "@/server/rawMessageParser";
 
 export const lifeAdminStatuses: LifeAdminStatus[] = ["new", "reviewed", "completed", "ignored"];
 
@@ -72,6 +75,12 @@ export interface CreateApprovalInput {
   description: string;
   sourceMessageId?: string;
   riskLevel?: ApprovalRequest["riskLevel"];
+}
+
+export interface IngestRawMessagesInput {
+  provider: RawLifeAdminMessage["provider"];
+  messages: Array<Omit<RawLifeAdminMessage, "id" | "provider"> & { id?: string }>;
+  notes?: string;
 }
 
 export class LifeAdminService {
@@ -225,6 +234,42 @@ export class LifeAdminService {
 
   async listApprovals(): Promise<ApprovalRequest[]> {
     return this.repository.listApprovals();
+  }
+
+  async ingestRawMessages(input: IngestRawMessagesInput): Promise<{ run: IngestionRun; items: LifeAdminMessage[] }> {
+    const startedAt = new Date().toISOString();
+    const createdItems: LifeAdminMessage[] = [];
+
+    for (const incoming of input.messages) {
+      const raw: RawLifeAdminMessage = {
+        ...incoming,
+        id: incoming.id ?? createId("raw"),
+        provider: input.provider,
+      };
+      await this.repository.createRawMessage(raw);
+      const item = await this.repository.createMessage(parseRawLifeAdminMessage(raw));
+      createdItems.push(item);
+    }
+
+    const completedAt = new Date().toISOString();
+    const run = await this.repository.createIngestionRun({
+      id: createId("ingest"),
+      provider: input.provider,
+      status: "completed",
+      startedAt,
+      completedAt,
+      inputCount: input.messages.length,
+      createdItemIds: createdItems.map((item) => item.id),
+      notes: input.notes,
+    });
+    await this.audit("integration_updated", "integration", input.provider, `Ingested ${createdItems.length} raw message(s) from ${input.provider}.`, {
+      inputCount: input.messages.length,
+    });
+    return { run, items: createdItems };
+  }
+
+  async listIngestionRuns(): Promise<IngestionRun[]> {
+    return this.repository.listIngestionRuns();
   }
 
   async createApproval(input: CreateApprovalInput): Promise<ApprovalRequest> {

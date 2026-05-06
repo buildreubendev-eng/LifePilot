@@ -108,4 +108,28 @@ describe("LifeAdminService", () => {
     expect(reviewed?.status).toBe("approved");
     expect(auditLog.map((event) => event.type)).toEqual(expect.arrayContaining(["approval_created", "approval_reviewed"]));
   });
+
+  it("ingests raw messages into normalized life-admin items", async () => {
+    const service = new LifeAdminService(new MockLifeAdminRepository());
+    const result = await service.ingestRawMessages({
+      provider: "gmail",
+      messages: [
+        {
+          id: "raw-cloudnest",
+          source: "Gmail",
+          sender: "CloudNest",
+          subject: "Your trial ends May 8",
+          body: "Your premium plan trial ends May 8 and will renew for $19.99/month.",
+          receivedAt: "2026-05-05T10:00:00-05:00",
+        },
+      ],
+      notes: "Test ingest",
+    });
+    const item = await service.getMessage("msg-raw-cloudnest");
+    const runs = await service.listIngestionRuns();
+
+    expect(result.items[0]?.category).toBe("renewal");
+    expect(item?.financialImpact).toBe(19.99);
+    expect(runs[0]?.createdItemIds).toContain("msg-raw-cloudnest");
+  });
 });

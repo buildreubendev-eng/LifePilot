@@ -5,6 +5,8 @@ import { GET as getAudit } from "@/app/api/life-admin/audit/route";
 import { GET as getDocuments } from "@/app/api/life-admin/documents/route";
 import { GET as getIntegrations } from "@/app/api/life-admin/integrations/route";
 import { PATCH as patchIntegration } from "@/app/api/life-admin/integrations/[provider]/route";
+import { POST as postIngest } from "@/app/api/life-admin/ingest/route";
+import { GET as getIngestRuns } from "@/app/api/life-admin/ingest/runs/route";
 import { POST as postAction } from "@/app/api/life-admin/items/[id]/action/route";
 import { GET as getItems } from "@/app/api/life-admin/items/route";
 import { GET as getItem, PATCH as patchItem } from "@/app/api/life-admin/items/[id]/route";
@@ -164,5 +166,33 @@ describe("life-admin API routes", () => {
     expect(createBody.approval.riskLevel).toBe("high");
     expect(reviewResponse.status).toBe(200);
     expect(approvalsBody.approvals.find((approval) => approval.id === createBody.approval.id)?.status).toBe("rejected");
+  });
+
+  it("ingests raw messages and records ingestion runs", async () => {
+    const ingestResponse = await postIngest(
+      new Request("http://localhost/api/life-admin/ingest", {
+        method: "POST",
+        body: JSON.stringify({
+          provider: "gmail",
+          messages: [
+            {
+              id: "raw-tax-form",
+              source: "Gmail",
+              sender: "BrightPath Brokerage",
+              subject: "Tax document available May 9",
+              body: "Your corrected 1099 tax document is available May 9.",
+              receivedAt: "2026-05-05T10:00:00-05:00",
+            },
+          ],
+        }),
+      }),
+    );
+    const ingestBody = (await ingestResponse.json()) as { items: Array<{ id: string; category: string }> };
+    const runsResponse = await getIngestRuns();
+    const runsBody = (await runsResponse.json()) as { runs: Array<{ createdItemIds: string[] }> };
+
+    expect(ingestResponse.status).toBe(200);
+    expect(ingestBody.items[0]).toMatchObject({ id: "msg-raw-tax-form", category: "tax/document" });
+    expect(runsBody.runs[0]?.createdItemIds).toContain("msg-raw-tax-form");
   });
 });

@@ -50,6 +50,8 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - `GET /api/life-admin/approvals`: list approval requests for sensitive actions.
 - `POST /api/life-admin/approvals`: create an approval request for `send_message`, `make_payment`, or `cancel_subscription`.
 - `PATCH /api/life-admin/approvals/:id`: approve or reject a pending approval request.
+- `POST /api/life-admin/ingest`: ingest raw provider messages into normalized life-admin items.
+- `GET /api/life-admin/ingest/runs`: list ingestion run history.
 - `POST /api/life-admin/reset`: reset the local MVP data store back to the mock seed state.
 
 Local MVP persistence is stored in `.data/plos-store.json`, which is ignored by Git. This keeps the backend stateful without introducing a database dependency before the integration model settles.

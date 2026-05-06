@@ -23,6 +23,8 @@ export type LifeAdminSource =
   | "SMS"
   | "Voicemail";
 
+export type RawMessageProvider = "gmail" | "google-calendar" | "plaid" | "health" | "manual";
+
 export interface ExtractedField {
   label: string;
   value: string;
@@ -183,4 +185,26 @@ export interface ApprovalRequest {
   updatedAt: string;
   reviewedAt?: string;
   reviewerNote?: string;
+}
+
+export interface RawLifeAdminMessage {
+  id: string;
+  provider: RawMessageProvider;
+  source: LifeAdminSource;
+  sender: string;
+  subject: string;
+  body: string;
+  receivedAt: string;
+  externalId?: string;
+}
+
+export interface IngestionRun {
+  id: string;
+  provider: RawMessageProvider;
+  status: "completed" | "failed";
+  startedAt: string;
+  completedAt: string;
+  inputCount: number;
+  createdItemIds: string[];
+  notes?: string;
 }

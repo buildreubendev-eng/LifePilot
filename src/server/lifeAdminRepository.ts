@@ -11,6 +11,8 @@ import type {
   LifeAdminMessage,
   LifeAdminStatus,
   ManualTask,
+  IngestionRun,
+  RawLifeAdminMessage,
   UserSettings,
 } from "@/lib/types";
 
@@ -23,6 +25,8 @@ export interface PlosDataStore {
   integrations: IntegrationConnection[];
   auditLog: AuditEvent[];
   approvals: ApprovalRequest[];
+  rawMessages: RawLifeAdminMessage[];
+  ingestionRuns: IngestionRun[];
 }
 
 export interface MessageFilters {
@@ -52,6 +56,11 @@ export interface LifeAdminRepository {
   listApprovals(): Promise<ApprovalRequest[]>;
   createApproval(approval: ApprovalRequest): Promise<ApprovalRequest>;
   updateApproval(id: string, patch: Partial<ApprovalRequest>): Promise<ApprovalRequest | null>;
+  createMessage(message: LifeAdminMessage): Promise<LifeAdminMessage>;
+  listRawMessages(): Promise<RawLifeAdminMessage[]>;
+  createRawMessage(message: RawLifeAdminMessage): Promise<RawLifeAdminMessage>;
+  listIngestionRuns(): Promise<IngestionRun[]>;
+  createIngestionRun(run: IngestionRun): Promise<IngestionRun>;
   resetStore(): Promise<PlosDataStore>;
   resetStatuses(): Promise<void>;
 }
@@ -70,6 +79,8 @@ export class MockLifeAdminRepository implements LifeAdminRepository {
       integrations: cloneIntegrations(initialStore?.integrations ?? createDefaultIntegrations()),
       auditLog: cloneAuditEvents(initialStore?.auditLog ?? []),
       approvals: cloneApprovals(initialStore?.approvals ?? []),
+      rawMessages: cloneRawMessages(initialStore?.rawMessages ?? []),
+      ingestionRuns: cloneIngestionRuns(initialStore?.ingestionRuns ?? []),
     };
   }
 
@@ -95,6 +106,11 @@ export class MockLifeAdminRepository implements LifeAdminRepository {
 
   async updateStatus(id: string, status: LifeAdminStatus): Promise<LifeAdminMessage | null> {
     return this.updateMessage(id, { status });
+  }
+
+  async createMessage(message: LifeAdminMessage): Promise<LifeAdminMessage> {
+    this.store.messages.push(cloneMessage(message) as LifeAdminMessage);
+    return cloneMessage(message) as LifeAdminMessage;
   }
 
   async listManualTasks(): Promise<ManualTask[]> {
@@ -192,6 +208,24 @@ export class MockLifeAdminRepository implements LifeAdminRepository {
     return cloneApproval(updated);
   }
 
+  async listRawMessages(): Promise<RawLifeAdminMessage[]> {
+    return cloneRawMessages(this.store.rawMessages);
+  }
+
+  async createRawMessage(message: RawLifeAdminMessage): Promise<RawLifeAdminMessage> {
+    this.store.rawMessages.push({ ...message });
+    return cloneRawMessage(message) as RawLifeAdminMessage;
+  }
+
+  async listIngestionRuns(): Promise<IngestionRun[]> {
+    return cloneIngestionRuns(this.store.ingestionRuns).reverse();
+  }
+
+  async createIngestionRun(run: IngestionRun): Promise<IngestionRun> {
+    this.store.ingestionRuns.push({ ...run, createdItemIds: [...run.createdItemIds] });
+    return cloneIngestionRun(run) as IngestionRun;
+  }
+
   async resetStore(): Promise<PlosDataStore> {
     this.store = createSeedStore();
     return cloneStore(this.store);
@@ -208,6 +242,8 @@ export class MockLifeAdminRepository implements LifeAdminRepository {
     this.store.manualTasks = [];
     this.store.documents = [];
     this.store.approvals = [];
+    this.store.rawMessages = [];
+    this.store.ingestionRuns = [];
   }
 }
 
@@ -240,6 +276,13 @@ export class JsonFileLifeAdminRepository implements LifeAdminRepository {
 
   async updateStatus(id: string, status: LifeAdminStatus): Promise<LifeAdminMessage | null> {
     return this.updateMessage(id, { status });
+  }
+
+  async createMessage(message: LifeAdminMessage): Promise<LifeAdminMessage> {
+    const store = await this.readStore();
+    store.messages.push(cloneMessage(message) as LifeAdminMessage);
+    await this.writeStore(store);
+    return cloneMessage(message) as LifeAdminMessage;
   }
 
   async listManualTasks(): Promise<ManualTask[]> {
@@ -360,6 +403,30 @@ export class JsonFileLifeAdminRepository implements LifeAdminRepository {
     return cloneApproval(updated);
   }
 
+  async listRawMessages(): Promise<RawLifeAdminMessage[]> {
+    const store = await this.readStore();
+    return cloneRawMessages(store.rawMessages);
+  }
+
+  async createRawMessage(message: RawLifeAdminMessage): Promise<RawLifeAdminMessage> {
+    const store = await this.readStore();
+    store.rawMessages.push({ ...message });
+    await this.writeStore(store);
+    return cloneRawMessage(message) as RawLifeAdminMessage;
+  }
+
+  async listIngestionRuns(): Promise<IngestionRun[]> {
+    const store = await this.readStore();
+    return cloneIngestionRuns(store.ingestionRuns).reverse();
+  }
+
+  async createIngestionRun(run: IngestionRun): Promise<IngestionRun> {
+    const store = await this.readStore();
+    store.ingestionRuns.push({ ...run, createdItemIds: [...run.createdItemIds] });
+    await this.writeStore(store);
+    return cloneIngestionRun(run) as IngestionRun;
+  }
+
   async resetStore(): Promise<PlosDataStore> {
     const store = createSeedStore();
     await this.writeStore(store);
@@ -378,6 +445,8 @@ export class JsonFileLifeAdminRepository implements LifeAdminRepository {
     store.manualTasks = [];
     store.documents = [];
     store.approvals = [];
+    store.rawMessages = [];
+    store.ingestionRuns = [];
     await this.writeStore(store);
   }
 
@@ -470,6 +539,8 @@ export function createSeedStore(seedMessages: LifeAdminMessage[] = mockMessages)
     integrations: createDefaultIntegrations(),
     auditLog: [],
     approvals: [],
+    rawMessages: [],
+    ingestionRuns: [],
   };
 }
 
@@ -484,6 +555,8 @@ function normalizeStore(store: Partial<PlosDataStore>): PlosDataStore {
     integrations: normalizeIntegrations(store.integrations ?? seed.integrations),
     auditLog: cloneAuditEvents(store.auditLog ?? []),
     approvals: cloneApprovals(store.approvals ?? []),
+    rawMessages: cloneRawMessages(store.rawMessages ?? []),
+    ingestionRuns: cloneIngestionRuns(store.ingestionRuns ?? []),
   };
 }
 
@@ -535,6 +608,8 @@ function cloneStore(store: PlosDataStore): PlosDataStore {
     integrations: cloneIntegrations(store.integrations),
     auditLog: cloneAuditEvents(store.auditLog),
     approvals: cloneApprovals(store.approvals),
+    rawMessages: cloneRawMessages(store.rawMessages),
+    ingestionRuns: cloneIngestionRuns(store.ingestionRuns),
   };
 }
 
@@ -598,4 +673,20 @@ function cloneApprovals(approvals: ApprovalRequest[]): ApprovalRequest[] {
 
 function cloneApproval(approval: ApprovalRequest | null): ApprovalRequest | null {
   return approval ? { ...approval } : null;
+}
+
+function cloneRawMessages(messages: RawLifeAdminMessage[]): RawLifeAdminMessage[] {
+  return messages.map((message) => cloneRawMessage(message) as RawLifeAdminMessage);
+}
+
+function cloneRawMessage(message: RawLifeAdminMessage | null): RawLifeAdminMessage | null {
+  return message ? { ...message } : null;
+}
+
+function cloneIngestionRuns(runs: IngestionRun[]): IngestionRun[] {
+  return runs.map((run) => cloneIngestionRun(run) as IngestionRun);
+}
+
+function cloneIngestionRun(run: IngestionRun | null): IngestionRun | null {
+  return run ? { ...run, createdItemIds: [...run.createdItemIds] } : null;
 }
