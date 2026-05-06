@@ -23,10 +23,22 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - `src/data/integrationAdapters.ts`: future integration boundary for Gmail, Calendar, Plaid, and health data.
 - `src/lib/prioritization.ts`: task generation, scoring, Life Admin Score, schedule conflicts, and weekly briefing logic.
 - `src/lib/usePlosStore.ts`: local browser state for item statuses.
+- `src/server/lifeAdminRepository.ts`: repository boundary for current mock data and future persistence.
+- `src/server/lifeAdminService.ts`: backend service for items, status updates, generated tasks, dashboard summary, and weekly briefing.
 - `src/components`: reusable cards, badges, filters, status controls, privacy panel, and page views.
 - `src/app`: Next.js App Router pages.
 - `gemini/START_HERE_UI_UX.md`: design-only starting brief for Gemini.
 - `UI_UX_ROADMAP.md`: broader design-only task list and roadmap.
+
+## Backend API
+
+- `GET /api/life-admin/items`: list parsed life-admin items.
+- `GET /api/life-admin/items/:id`: fetch one parsed item.
+- `PATCH /api/life-admin/items/:id`: update item status with `new`, `reviewed`, `completed`, or `ignored`.
+- `GET /api/life-admin/tasks`: list generated and prioritized tasks.
+- `GET /api/life-admin/dashboard`: return Life Admin Score, priority tasks, and dashboard counts.
+- `GET /api/life-admin/briefing`: return weekly briefing summary.
+- `POST /api/life-admin/reset`: reset mock status changes.
 
 ## Run The App
 

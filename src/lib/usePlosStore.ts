@@ -1,38 +1,97 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { mockMessages } from "@/data/mockMessages";
-import { applyStatusMap, updateStatusMap } from "@/lib/status";
-import type { LifeAdminStatus, StatusMap } from "@/lib/types";
-
-const storageKey = "plos-status-map";
+import type { LifeAdminMessage, LifeAdminStatus } from "@/lib/types";
 
 export function usePlosStore() {
-  const [statusMap, setStatusMap] = useState<StatusMap>(() => {
-    if (typeof window === "undefined") {
-      return {};
-    }
-
-    const stored = window.localStorage.getItem(storageKey);
-    return stored ? (JSON.parse(stored) as StatusMap) : {};
-  });
+  const [items, setItems] = useState<LifeAdminMessage[]>(mockMessages);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    window.localStorage.setItem(storageKey, JSON.stringify(statusMap));
-  }, [statusMap]);
+    let active = true;
 
-  const items = useMemo(() => applyStatusMap(mockMessages, statusMap), [statusMap]);
+    async function loadItems() {
+      try {
+        const response = await fetch("/api/life-admin/items");
 
-  function setItemStatus(itemId: string, status: LifeAdminStatus) {
-    setStatusMap((current) => updateStatusMap(current, itemId, status));
-  }
+        if (!response.ok) {
+          throw new Error("Unable to load PLOS items");
+        }
 
-  function resetStatuses() {
-    setStatusMap({});
-  }
+        const body = (await response.json()) as { items: LifeAdminMessage[] };
+
+        if (active) {
+          setItems(body.items);
+          setError(null);
+        }
+      } catch (loadError) {
+        if (active) {
+          setError(loadError instanceof Error ? loadError.message : "Unable to load PLOS items");
+        }
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadItems();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const setItemStatus = useCallback(async (itemId: string, status: LifeAdminStatus) => {
+    const previousItems = items;
+    setItems((current) => current.map((item) => (item.id === itemId ? { ...item, status } : item)));
+
+    try {
+      const response = await fetch(`/api/life-admin/items/${itemId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to update item status");
+      }
+
+      const body = (await response.json()) as { item: LifeAdminMessage };
+      setItems((current) => current.map((item) => (item.id === itemId ? body.item : item)));
+      setError(null);
+    } catch (updateError) {
+      setItems(previousItems);
+      setError(updateError instanceof Error ? updateError.message : "Unable to update item status");
+    }
+  }, [items]);
+
+  const resetStatuses = useCallback(async () => {
+    try {
+      const response = await fetch("/api/life-admin/reset", {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to reset statuses");
+      }
+
+      const body = (await response.json()) as { items: LifeAdminMessage[] };
+      setItems(body.items);
+      setError(null);
+    } catch (resetError) {
+      setError(resetError instanceof Error ? resetError.message : "Unable to reset statuses");
+    }
+  }, []);
 
   return {
     items,
+    isLoading,
+    error,
     setItemStatus,
     resetStatuses,
   };
