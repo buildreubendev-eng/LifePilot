@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { Badge } from "@/components/Badge";
 import { EmptyState } from "@/components/EmptyState";
 import { StatusControl } from "@/components/StatusControl";
@@ -9,14 +10,36 @@ import { scoreLifeAdminItem } from "@/lib/prioritization";
 import { usePlosStore } from "@/lib/usePlosStore";
 
 export function InboxDetailView({ id }: { id: string }) {
-  const { items, setItemStatus } = usePlosStore();
+  const { items, setItemStatus, performItemAction, error } = usePlosStore();
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
   const item = items.find((candidate) => candidate.id === id);
 
   if (!item) {
     return <EmptyState title="Item not found" copy="This inbox item does not exist in the current mock data set." />;
   }
 
+  const currentItem = item;
   const task = scoreLifeAdminItem(item);
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const snoozeDate = tomorrow.toISOString().slice(0, 10);
+
+  async function runAction(action: "snooze" | "save_document" | "create_task") {
+    const result = await performItemAction(
+      currentItem.id,
+      action,
+      action === "snooze" ? { snoozedUntil: snoozeDate } : action === "create_task" ? { taskTitle: task.title } : {},
+    );
+
+    if (result) {
+      const labels = {
+        snooze: `Snoozed until ${snoozeDate}.`,
+        save_document: "Document saved to records.",
+        create_task: "Task created from this item.",
+      };
+      setActionMessage(labels[action]);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-5xl py-4">
@@ -27,23 +50,23 @@ export function InboxDetailView({ id }: { id: string }) {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="flex flex-wrap gap-2">
-              <Badge variant={item.category}>{item.category}</Badge>
-              <Badge variant={item.priority}>{item.priority}</Badge>
-              <Badge variant={item.status}>{item.status}</Badge>
+              <Badge variant={currentItem.category}>{currentItem.category}</Badge>
+              <Badge variant={currentItem.priority}>{currentItem.priority}</Badge>
+              <Badge variant={currentItem.status}>{currentItem.status}</Badge>
               <Badge variant="score">Score {task.score}</Badge>
             </div>
-            <h1 className="mt-4 text-3xl font-black text-stone-950">{item.title}</h1>
-            <p className="mt-3 text-stone-600">{item.sender} via {item.source}</p>
+            <h1 className="mt-4 text-3xl font-black text-stone-950">{currentItem.title}</h1>
+            <p className="mt-3 text-stone-600">{currentItem.sender} via {currentItem.source}</p>
           </div>
           <div className="rounded-md bg-stone-100 px-3 py-2 text-sm font-semibold text-stone-700">
-            {formatRelativeDueDate(item.dueDate)}
+            {formatRelativeDueDate(currentItem.dueDate)}
           </div>
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-lg bg-stone-50 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">Due date</p>
-            <p className="mt-2 font-semibold text-stone-950">{formatDate(item.dueDate)}</p>
+            <p className="mt-2 font-semibold text-stone-950">{formatDate(currentItem.dueDate)}</p>
           </div>
           <div className="rounded-lg bg-stone-50 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">Confidence</p>
@@ -88,14 +111,19 @@ export function InboxDetailView({ id }: { id: string }) {
           <h2 className="text-lg font-bold text-stone-950">Actions</h2>
           <div className="mt-4 flex flex-col gap-3">
             <StatusControl value={item.status} onChange={(status) => setItemStatus(item.id, status)} />
+            {(actionMessage || error) ? (
+              <div className={`rounded-md px-3 py-2 text-sm font-semibold ${error ? "bg-red-100 text-red-800" : "bg-emerald-100 text-emerald-800"}`}>
+                {error ?? actionMessage}
+              </div>
+            ) : null}
             <div className="grid gap-2 sm:grid-cols-3">
-              <button type="button" onClick={() => setItemStatus(item.id, "reviewed")} className="rounded-md bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200">
+              <button type="button" onClick={() => void runAction("snooze")} className="rounded-md bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200">
                 Snooze
               </button>
-              <button type="button" onClick={() => setItemStatus(item.id, "reviewed")} className="rounded-md bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200">
+              <button type="button" onClick={() => void runAction("save_document")} className="rounded-md bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200">
                 Save Document
               </button>
-              <button type="button" onClick={() => setItemStatus(item.id, "reviewed")} className="rounded-md bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200">
+              <button type="button" onClick={() => void runAction("create_task")} className="rounded-md bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200">
                 Create Task
               </button>
             </div>

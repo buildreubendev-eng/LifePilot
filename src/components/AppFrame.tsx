@@ -9,6 +9,10 @@ const navigation = [
   { href: "/tasks", label: "Tasks" },
   { href: "/briefing", label: "Weekly Briefing" },
   { href: "/documents", label: "Documents" },
+  { href: "/approvals", label: "Approvals" },
+  { href: "/integrations", label: "Integrations" },
+  { href: "/ingest", label: "Ingest" },
+  { href: "/activity", label: "Activity" },
   { href: "/settings", label: "Settings" },
 ];
 

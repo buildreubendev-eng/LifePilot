@@ -11,7 +11,7 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - Item detail view with original message, extracted fields, flagged reason, suggested next action, status controls, and MVP action buttons.
 - Task generation and prioritization service using due date proximity, financial impact, category importance, confidence, and overdue status.
 - Weekly Briefing generated from the same mock data.
-- Documents and Settings pages with no placeholder-only routes.
+- Documents, Approvals, Integrations, Ingest, Activity, and Settings pages with no placeholder-only routes.
 - Local status changes persisted in browser localStorage.
 - Privacy-first settings panel and integration comments for future Gmail, Google Calendar, Plaid, and health connectors.
 - Basic Vitest coverage for prioritization behavior.
@@ -27,6 +27,7 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - `src/server/lifeAdminService.ts`: backend service for items, status updates, generated tasks, dashboard summary, and weekly briefing.
 - `src/components`: reusable cards, badges, filters, status controls, privacy panel, and page views.
 - `src/app`: Next.js App Router pages.
+- `src/lib/apiClient.ts`: small browser fetch helper for typed backend calls.
 - `gemini/START_HERE_UI_UX.md`: design-only starting brief for Gemini.
 - `UI_UX_ROADMAP.md`: broader design-only task list and roadmap.
 

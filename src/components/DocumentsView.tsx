@@ -1,12 +1,43 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ItemCard } from "@/components/ItemCard";
 import { Section } from "@/components/Section";
+import { fetchJson } from "@/lib/apiClient";
+import type { DocumentRecord } from "@/lib/types";
 import { usePlosStore } from "@/lib/usePlosStore";
 
 export function DocumentsView() {
   const { items } = usePlosStore();
+  const [savedDocuments, setSavedDocuments] = useState<DocumentRecord[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const documents = items.filter((item) => item.documentSaveRecommended);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadDocuments() {
+      const body = await fetchJson<{ documents: DocumentRecord[] }>("/api/life-admin/documents");
+      if (active) {
+        setSavedDocuments(body.documents);
+      }
+    }
+
+    async function loadInitialDocuments() {
+      try {
+        await loadDocuments();
+      } catch (loadError) {
+        if (active) {
+          setError(loadError instanceof Error ? loadError.message : "Unable to load documents");
+        }
+      }
+    }
+
+    void loadInitialDocuments();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div>
@@ -16,6 +47,29 @@ export function DocumentsView() {
           Receipts, confirmations, forms, and tax records that PLOS recommends saving.
         </p>
       </section>
+      <Section title="Saved Records">
+        {savedDocuments.length === 0 ? (
+          <div className="rounded-lg border border-stone-200 bg-white p-4 text-sm text-stone-600">
+            No documents have been saved yet. Use Save Document from an inbox detail page to populate this list.
+          </div>
+        ) : (
+          <div className="grid gap-3 lg:grid-cols-2">
+            {savedDocuments.map((document) => (
+              <div key={document.id} className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">{document.category}</p>
+                    <h3 className="mt-2 text-base font-bold text-stone-950">{document.title}</h3>
+                    <p className="mt-2 text-sm text-stone-600">Saved {new Date(document.savedAt).toLocaleString()} from {document.source}</p>
+                  </div>
+                  <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">{document.status}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {error ? <p className="mt-3 text-sm font-semibold text-red-700">{error}</p> : null}
+      </Section>
       <Section title="Save Queue">
         <div className="grid gap-3 lg:grid-cols-2">
           {documents.map((item) => (

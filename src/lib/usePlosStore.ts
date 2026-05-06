@@ -2,7 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { mockMessages } from "@/data/mockMessages";
-import type { LifeAdminMessage, LifeAdminStatus } from "@/lib/types";
+import type { DocumentRecord, LifeAdminAction, LifeAdminMessage, LifeAdminStatus, ManualTask } from "@/lib/types";
+
+interface ItemActionResult {
+  item: LifeAdminMessage;
+  document?: DocumentRecord;
+  task?: ManualTask;
+}
 
 export function usePlosStore() {
   const [items, setItems] = useState<LifeAdminMessage[]>(mockMessages);
@@ -70,6 +76,30 @@ export function usePlosStore() {
     }
   }, [items]);
 
+  const performItemAction = useCallback(async (itemId: string, action: LifeAdminAction, payload: Record<string, string> = {}) => {
+    try {
+      const response = await fetch(`/api/life-admin/items/${itemId}/action`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action, ...payload }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to complete item action");
+      }
+
+      const body = (await response.json()) as ItemActionResult;
+      setItems((current) => current.map((item) => (item.id === itemId ? body.item : item)));
+      setError(null);
+      return body;
+    } catch (actionError) {
+      setError(actionError instanceof Error ? actionError.message : "Unable to complete item action");
+      return null;
+    }
+  }, []);
+
   const resetStatuses = useCallback(async () => {
     try {
       const response = await fetch("/api/life-admin/reset", {
@@ -93,6 +123,7 @@ export function usePlosStore() {
     isLoading,
     error,
     setItemStatus,
+    performItemAction,
     resetStatuses,
   };
 }
