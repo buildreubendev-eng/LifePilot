@@ -7,6 +7,7 @@ const navigation = [
   { href: "/", label: "Dashboard" },
   { href: "/inbox", label: "AI Inbox" },
   { href: "/tasks", label: "Tasks" },
+  { href: "/recommendations", label: "Recommendations" },
   { href: "/briefing", label: "Weekly Briefing" },
   { href: "/documents", label: "Documents" },
   { href: "/approvals", label: "Approvals" },

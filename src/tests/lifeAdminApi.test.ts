@@ -10,6 +10,8 @@ import { GET as getIngestRuns } from "@/app/api/life-admin/ingest/runs/route";
 import { POST as postAction } from "@/app/api/life-admin/items/[id]/action/route";
 import { GET as getItems } from "@/app/api/life-admin/items/route";
 import { GET as getItem, PATCH as patchItem } from "@/app/api/life-admin/items/[id]/route";
+import { POST as acceptRecommendation } from "@/app/api/life-admin/recommendations/[id]/accept/route";
+import { GET as getRecommendations } from "@/app/api/life-admin/recommendations/route";
 import { GET as getSettings, PATCH as patchSettings } from "@/app/api/life-admin/settings/route";
 import { GET as getTasks } from "@/app/api/life-admin/tasks/route";
 import { MockLifeAdminRepository, setLifeAdminRepository } from "@/server/lifeAdminRepository";
@@ -194,5 +196,24 @@ describe("life-admin API routes", () => {
     expect(ingestResponse.status).toBe(200);
     expect(ingestBody.items[0]).toMatchObject({ id: "msg-raw-tax-form", category: "tax/document" });
     expect(runsBody.runs[0]?.createdItemIds).toContain("msg-raw-tax-form");
+  });
+
+  it("returns recommendations and accepts them", async () => {
+    const recommendationsResponse = await getRecommendations();
+    const recommendationsBody = (await recommendationsResponse.json()) as {
+      recommendations: Array<{ id: string; actionType: string }>;
+    };
+    const approvalRecommendation = recommendationsBody.recommendations.find((recommendation) => recommendation.actionType === "create_approval");
+
+    expect(recommendationsResponse.status).toBe(200);
+    expect(approvalRecommendation).toBeTruthy();
+
+    const acceptResponse = await acceptRecommendation(new Request("http://localhost/api/life-admin/recommendations/x/accept", { method: "POST" }), {
+      params: Promise.resolve({ id: approvalRecommendation?.id ?? "" }),
+    });
+    const acceptBody = (await acceptResponse.json()) as { approval?: { status: string } };
+
+    expect(acceptResponse.status).toBe(200);
+    expect(acceptBody.approval?.status).toBe("pending");
   });
 });

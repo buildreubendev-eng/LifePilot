@@ -4,6 +4,7 @@ import type {
   ApprovalActionType,
   ApprovalRequest,
   ApprovalStatus,
+  ActionRecommendation,
   BriefingSummary,
   DocumentRecord,
   IntegrationConnection,
@@ -17,10 +18,12 @@ import type {
   ManualTask,
   Priority,
   RawLifeAdminMessage,
+  RecommendationAcceptResult,
   UserSettings,
 } from "@/lib/types";
 import { getLifeAdminRepository, type LifeAdminRepository, type MessageFilters } from "@/server/lifeAdminRepository";
 import { parseRawLifeAdminMessage } from "@/server/rawMessageParser";
+import { generateActionRecommendations } from "@/server/recommendationEngine";
 
 export const lifeAdminStatuses: LifeAdminStatus[] = ["new", "reviewed", "completed", "ignored"];
 
@@ -234,6 +237,58 @@ export class LifeAdminService {
 
   async listApprovals(): Promise<ApprovalRequest[]> {
     return this.repository.listApprovals();
+  }
+
+  async listRecommendations(now = new Date()): Promise<ActionRecommendation[]> {
+    const [messages, documents, tasks, approvals] = await Promise.all([
+      this.repository.listMessages(),
+      this.repository.listDocuments(),
+      this.repository.listManualTasks(),
+      this.repository.listApprovals(),
+    ]);
+
+    return generateActionRecommendations({ messages, documents, tasks, approvals, now });
+  }
+
+  async acceptRecommendation(id: string): Promise<RecommendationAcceptResult | null> {
+    const recommendations = await this.listRecommendations();
+    const recommendation = recommendations.find((candidate) => candidate.id === id);
+
+    if (!recommendation) {
+      return null;
+    }
+
+    const item = await this.repository.getMessage(recommendation.sourceMessageId);
+
+    if (!item) {
+      return null;
+    }
+
+    if (recommendation.actionType === "create_approval" && recommendation.approvalActionType) {
+      const approval = await this.createApproval({
+        actionType: recommendation.approvalActionType,
+        title: recommendation.title,
+        description: recommendation.description,
+        sourceMessageId: recommendation.sourceMessageId,
+        riskLevel: recommendation.riskLevel,
+      });
+      return { recommendation, item, approval };
+    }
+
+    if (recommendation.actionType === "save_document") {
+      const result = await this.performItemAction(recommendation.sourceMessageId, { action: "save_document" });
+      return result ? { recommendation, ...result } : null;
+    }
+
+    if (recommendation.actionType === "create_task") {
+      const result = await this.performItemAction(recommendation.sourceMessageId, {
+        action: "create_task",
+        taskTitle: recommendation.title.replace(/^Create task for /, ""),
+      });
+      return result ? { recommendation, ...result } : null;
+    }
+
+    return null;
   }
 
   async ingestRawMessages(input: IngestRawMessagesInput): Promise<{ run: IngestionRun; items: LifeAdminMessage[] }> {

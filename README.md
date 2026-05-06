@@ -10,6 +10,7 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - AI Inbox with 20 realistic parsed life-admin messages.
 - Item detail view with original message, extracted fields, flagged reason, suggested next action, status controls, and MVP action buttons.
 - Task generation and prioritization service using due date proximity, financial impact, category importance, confidence, and overdue status.
+- Recommendation engine that turns active items into safe next moves, approval requests, saved documents, and tasks.
 - Weekly Briefing generated from the same mock data.
 - Documents, Approvals, Integrations, Ingest, Activity, and Settings pages with no placeholder-only routes.
 - Local status changes persisted in browser localStorage.
@@ -40,6 +41,8 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - `GET /api/life-admin/tasks`: list generated and prioritized tasks.
 - `POST /api/life-admin/tasks`: create a manual task.
 - `PATCH /api/life-admin/tasks/:id`: update a manual task.
+- `GET /api/life-admin/recommendations`: list generated next-step recommendations.
+- `POST /api/life-admin/recommendations/:id/accept`: accept a recommendation and create its durable backend artifact.
 - `GET /api/life-admin/dashboard`: return Life Admin Score, priority tasks, and dashboard counts.
 - `GET /api/life-admin/briefing`: return weekly briefing summary.
 - `GET /api/life-admin/documents`: list saved document records.

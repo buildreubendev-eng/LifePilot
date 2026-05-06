@@ -4,11 +4,15 @@ import { ItemCard } from "@/components/ItemCard";
 import { MetricCard } from "@/components/MetricCard";
 import { PrivacyPanel } from "@/components/PrivacyPanel";
 import { Section } from "@/components/Section";
+import { fetchJson } from "@/lib/apiClient";
+import type { ActionRecommendation } from "@/lib/types";
 import { usePlosStore } from "@/lib/usePlosStore";
 import { calculateLifeAdminScore, daysUntil, generateTasks } from "@/lib/prioritization";
+import { useEffect, useState } from "react";
 
 export function DashboardView() {
   const { items } = usePlosStore();
+  const [recommendationCount, setRecommendationCount] = useState(0);
   const tasks = generateTasks(items);
   const score = calculateLifeAdminScore(items);
   const activeItems = items.filter((item) => item.status !== "completed" && item.status !== "ignored");
@@ -20,6 +24,28 @@ export function DashboardView() {
     const distance = daysUntil(item.dueDate);
     return distance !== undefined && distance >= 0 && distance <= 7;
   });
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadRecommendations() {
+      try {
+        const body = await fetchJson<{ recommendations: ActionRecommendation[] }>("/api/life-admin/recommendations");
+        if (active) {
+          setRecommendationCount(body.recommendations.length);
+        }
+      } catch {
+        if (active) {
+          setRecommendationCount(0);
+        }
+      }
+    }
+
+    void loadRecommendations();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div>
@@ -46,11 +72,12 @@ export function DashboardView() {
         </div>
       </section>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-5">
         <MetricCard label="Priority actions" value={tasks.slice(0, 8).length} detail="Highest scoring tasks ready now" />
         <MetricCard label="Due this week" value={dueSoon.length} detail="Deadlines, appointments, and replies" />
         <MetricCard label="Overdue" value={overdue.length} detail="Needs immediate review" />
         <MetricCard label="Documents" value={items.filter((item) => item.documentSaveRecommended).length} detail="Receipts, forms, and confirmations" />
+        <MetricCard label="Suggestions" value={recommendationCount} detail="Safe next moves from PLOS" />
       </div>
 
       <Section title="Today&apos;s Priority Actions">

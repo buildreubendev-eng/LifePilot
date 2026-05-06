@@ -132,4 +132,34 @@ describe("LifeAdminService", () => {
     expect(item?.financialImpact).toBe(19.99);
     expect(runs[0]?.createdItemIds).toContain("msg-raw-cloudnest");
   });
+
+  it("generates recommendations and accepts sensitive actions as approvals", async () => {
+    const service = new LifeAdminService(new MockLifeAdminRepository());
+    const recommendations = await service.listRecommendations(now);
+    const paymentRecommendation = recommendations.find(
+      (recommendation) => recommendation.actionType === "create_approval" && recommendation.approvalActionType === "make_payment",
+    );
+
+    expect(paymentRecommendation).toBeTruthy();
+
+    const result = await service.acceptRecommendation(paymentRecommendation?.id ?? "");
+    const approvals = await service.listApprovals();
+
+    expect(result?.approval?.actionType).toBe("make_payment");
+    expect(approvals.some((approval) => approval.id === result?.approval?.id)).toBe(true);
+  });
+
+  it("accepts document recommendations by saving records", async () => {
+    const service = new LifeAdminService(new MockLifeAdminRepository());
+    const recommendations = await service.listRecommendations(now);
+    const documentRecommendation = recommendations.find((recommendation) => recommendation.actionType === "save_document");
+
+    expect(documentRecommendation).toBeTruthy();
+
+    const result = await service.acceptRecommendation(documentRecommendation?.id ?? "");
+    const documents = await service.listDocuments();
+
+    expect(result?.document?.sourceMessageId).toBe(documentRecommendation?.sourceMessageId);
+    expect(documents.some((document) => document.id === result?.document?.id)).toBe(true);
+  });
 });

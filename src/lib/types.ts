@@ -208,3 +208,27 @@ export interface IngestionRun {
   createdItemIds: string[];
   notes?: string;
 }
+
+export type RecommendationActionType = "create_approval" | "save_document" | "create_task";
+
+export interface ActionRecommendation {
+  id: string;
+  sourceMessageId: string;
+  actionType: RecommendationActionType;
+  approvalActionType?: ApprovalActionType;
+  title: string;
+  description: string;
+  reason: string;
+  priority: Priority;
+  riskLevel: ApprovalRequest["riskLevel"];
+  dueDate?: string;
+  acceptLabel: string;
+}
+
+export interface RecommendationAcceptResult {
+  recommendation: ActionRecommendation;
+  item?: LifeAdminMessage;
+  document?: DocumentRecord;
+  task?: ManualTask;
+  approval?: ApprovalRequest;
+}
