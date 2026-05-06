@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { PATCH as patchApproval } from "@/app/api/life-admin/approvals/[id]/route";
+import { GET as getApprovals, POST as postApproval } from "@/app/api/life-admin/approvals/route";
 import { GET as getAudit } from "@/app/api/life-admin/audit/route";
 import { GET as getDocuments } from "@/app/api/life-admin/documents/route";
 import { GET as getIntegrations } from "@/app/api/life-admin/integrations/route";
@@ -132,5 +134,35 @@ describe("life-admin API routes", () => {
 
     expect(response.status).toBe(200);
     expect(body.auditLog.some((event) => event.type === "status_updated")).toBe(true);
+  });
+
+  it("creates and reviews approval requests", async () => {
+    const createResponse = await postApproval(
+      new Request("http://localhost/api/life-admin/approvals", {
+        method: "POST",
+        body: JSON.stringify({
+          actionType: "cancel_subscription",
+          title: "Cancel CloudNest trial",
+          description: "Requires explicit approval before cancellation.",
+          sourceMessageId: "msg-free-trial",
+        }),
+      }),
+    );
+    const createBody = (await createResponse.json()) as { approval: { id: string; status: string; riskLevel: string } };
+    const reviewResponse = await patchApproval(
+      new Request(`http://localhost/api/life-admin/approvals/${createBody.approval.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "rejected", reviewerNote: "Keep it for one more month." }),
+      }),
+      { params: Promise.resolve({ id: createBody.approval.id }) },
+    );
+    const approvalsResponse = await getApprovals();
+    const approvalsBody = (await approvalsResponse.json()) as { approvals: Array<{ id: string; status: string }> };
+
+    expect(createResponse.status).toBe(200);
+    expect(createBody.approval.status).toBe("pending");
+    expect(createBody.approval.riskLevel).toBe("high");
+    expect(reviewResponse.status).toBe(200);
+    expect(approvalsBody.approvals.find((approval) => approval.id === createBody.approval.id)?.status).toBe("rejected");
   });
 });

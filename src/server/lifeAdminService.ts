@@ -1,6 +1,9 @@
 import { calculateLifeAdminScore, createWeeklyBriefing, daysUntil, generateTasks, scoreLifeAdminItem } from "@/lib/prioritization";
 import type {
   AuditEvent,
+  ApprovalActionType,
+  ApprovalRequest,
+  ApprovalStatus,
   BriefingSummary,
   DocumentRecord,
   IntegrationConnection,
@@ -61,6 +64,14 @@ export interface CreateManualTaskInput {
   priority?: Priority;
   suggestedAction?: string;
   sourceMessageId?: string;
+}
+
+export interface CreateApprovalInput {
+  actionType: ApprovalActionType;
+  title: string;
+  description: string;
+  sourceMessageId?: string;
+  riskLevel?: ApprovalRequest["riskLevel"];
 }
 
 export class LifeAdminService {
@@ -212,6 +223,49 @@ export class LifeAdminService {
     return this.repository.listDocuments();
   }
 
+  async listApprovals(): Promise<ApprovalRequest[]> {
+    return this.repository.listApprovals();
+  }
+
+  async createApproval(input: CreateApprovalInput): Promise<ApprovalRequest> {
+    const now = new Date().toISOString();
+    const approval: ApprovalRequest = {
+      id: createId("approval"),
+      actionType: input.actionType,
+      sourceMessageId: input.sourceMessageId,
+      title: input.title,
+      description: input.description,
+      riskLevel: input.riskLevel ?? defaultRiskLevel(input.actionType),
+      status: "pending",
+      createdAt: now,
+      updatedAt: now,
+    };
+    const created = await this.repository.createApproval(approval);
+    await this.audit("approval_created", "approval", created.id, `Created approval request "${created.title}".`, {
+      actionType: created.actionType,
+      sourceMessageId: created.sourceMessageId ?? null,
+    });
+    return created;
+  }
+
+  async reviewApproval(id: string, status: Exclude<ApprovalStatus, "pending">, reviewerNote?: string): Promise<ApprovalRequest | null> {
+    const now = new Date().toISOString();
+    const approval = await this.repository.updateApproval(id, {
+      status,
+      reviewerNote,
+      reviewedAt: now,
+      updatedAt: now,
+    });
+
+    if (approval) {
+      await this.audit("approval_reviewed", "approval", id, `Marked approval request "${approval.title}" as ${status}.`, {
+        status,
+      });
+    }
+
+    return approval;
+  }
+
   async getBriefing(now = new Date()): Promise<BriefingSummary> {
     const messages = await this.repository.listMessages();
     return createWeeklyBriefing(messages, now);
@@ -337,6 +391,14 @@ export function isLifeAdminAction(value: unknown): value is LifeAdminAction {
 
 function createId(prefix: string): string {
   return `${prefix}-${crypto.randomUUID()}`;
+}
+
+function defaultRiskLevel(actionType: ApprovalActionType): ApprovalRequest["riskLevel"] {
+  if (actionType === "make_payment" || actionType === "cancel_subscription") {
+    return "high";
+  }
+
+  return "medium";
 }
 
 function manualTaskToLifeAdminTask(task: ManualTask, now: Date): LifeAdminTask {

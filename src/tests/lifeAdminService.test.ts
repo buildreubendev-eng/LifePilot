@@ -91,4 +91,21 @@ describe("LifeAdminService", () => {
       await rm(directory, { recursive: true, force: true });
     }
   });
+
+  it("creates and reviews approval requests with audit history", async () => {
+    const service = new LifeAdminService(new MockLifeAdminRepository());
+    const approval = await service.createApproval({
+      actionType: "make_payment",
+      title: "Pay medical bill",
+      description: "Approve payment only after reviewing the EOB.",
+      sourceMessageId: "msg-medical-bill",
+    });
+    const reviewed = await service.reviewApproval(approval.id, "approved", "Looks correct.");
+    const auditLog = await service.listAuditEvents();
+
+    expect(approval.status).toBe("pending");
+    expect(approval.riskLevel).toBe("high");
+    expect(reviewed?.status).toBe("approved");
+    expect(auditLog.map((event) => event.type)).toEqual(expect.arrayContaining(["approval_created", "approval_reviewed"]));
+  });
 });

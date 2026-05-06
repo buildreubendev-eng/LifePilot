@@ -151,6 +151,8 @@ export type AuditEventType =
   | "document_saved"
   | "task_created"
   | "task_updated"
+  | "approval_created"
+  | "approval_reviewed"
   | "settings_updated"
   | "integration_updated"
   | "store_reset";
@@ -158,9 +160,27 @@ export type AuditEventType =
 export interface AuditEvent {
   id: string;
   type: AuditEventType;
-  entityType: "message" | "task" | "document" | "settings" | "integration" | "store";
+  entityType: "message" | "task" | "document" | "approval" | "settings" | "integration" | "store";
   entityId: string;
   summary: string;
   createdAt: string;
   metadata?: Record<string, string | number | boolean | null>;
+}
+
+export type ApprovalActionType = "send_message" | "make_payment" | "cancel_subscription";
+
+export type ApprovalStatus = "pending" | "approved" | "rejected";
+
+export interface ApprovalRequest {
+  id: string;
+  actionType: ApprovalActionType;
+  sourceMessageId?: string;
+  title: string;
+  description: string;
+  riskLevel: "low" | "medium" | "high";
+  status: ApprovalStatus;
+  createdAt: string;
+  updatedAt: string;
+  reviewedAt?: string;
+  reviewerNote?: string;
 }

@@ -4,6 +4,7 @@ import { cwd } from "node:process";
 import { mockMessages } from "@/data/mockMessages";
 import type {
   AuditEvent,
+  ApprovalRequest,
   DocumentRecord,
   IntegrationConnection,
   IntegrationProvider,
@@ -21,6 +22,7 @@ export interface PlosDataStore {
   settings: UserSettings;
   integrations: IntegrationConnection[];
   auditLog: AuditEvent[];
+  approvals: ApprovalRequest[];
 }
 
 export interface MessageFilters {
@@ -47,6 +49,9 @@ export interface LifeAdminRepository {
   updateIntegration(provider: IntegrationProvider, patch: Partial<IntegrationConnection>): Promise<IntegrationConnection | null>;
   listAuditEvents(limit?: number): Promise<AuditEvent[]>;
   appendAuditEvent(event: AuditEvent): Promise<AuditEvent>;
+  listApprovals(): Promise<ApprovalRequest[]>;
+  createApproval(approval: ApprovalRequest): Promise<ApprovalRequest>;
+  updateApproval(id: string, patch: Partial<ApprovalRequest>): Promise<ApprovalRequest | null>;
   resetStore(): Promise<PlosDataStore>;
   resetStatuses(): Promise<void>;
 }
@@ -64,6 +69,7 @@ export class MockLifeAdminRepository implements LifeAdminRepository {
       settings: cloneSettings(initialStore?.settings ?? createDefaultSettings()),
       integrations: cloneIntegrations(initialStore?.integrations ?? createDefaultIntegrations()),
       auditLog: cloneAuditEvents(initialStore?.auditLog ?? []),
+      approvals: cloneApprovals(initialStore?.approvals ?? []),
     };
   }
 
@@ -165,6 +171,27 @@ export class MockLifeAdminRepository implements LifeAdminRepository {
     return cloneAuditEvent(event) as AuditEvent;
   }
 
+  async listApprovals(): Promise<ApprovalRequest[]> {
+    return cloneApprovals(this.store.approvals);
+  }
+
+  async createApproval(approval: ApprovalRequest): Promise<ApprovalRequest> {
+    this.store.approvals.push({ ...approval });
+    return cloneApproval(approval) as ApprovalRequest;
+  }
+
+  async updateApproval(id: string, patch: Partial<ApprovalRequest>): Promise<ApprovalRequest | null> {
+    const index = this.store.approvals.findIndex((approval) => approval.id === id);
+
+    if (index === -1) {
+      return null;
+    }
+
+    const updated = { ...this.store.approvals[index], ...patch, id, updatedAt: patch.updatedAt ?? new Date().toISOString() };
+    this.store.approvals[index] = updated;
+    return cloneApproval(updated);
+  }
+
   async resetStore(): Promise<PlosDataStore> {
     this.store = createSeedStore();
     return cloneStore(this.store);
@@ -180,6 +207,7 @@ export class MockLifeAdminRepository implements LifeAdminRepository {
     }));
     this.store.manualTasks = [];
     this.store.documents = [];
+    this.store.approvals = [];
   }
 }
 
@@ -306,6 +334,32 @@ export class JsonFileLifeAdminRepository implements LifeAdminRepository {
     return cloneAuditEvent(event) as AuditEvent;
   }
 
+  async listApprovals(): Promise<ApprovalRequest[]> {
+    const store = await this.readStore();
+    return cloneApprovals(store.approvals);
+  }
+
+  async createApproval(approval: ApprovalRequest): Promise<ApprovalRequest> {
+    const store = await this.readStore();
+    store.approvals.push({ ...approval });
+    await this.writeStore(store);
+    return cloneApproval(approval) as ApprovalRequest;
+  }
+
+  async updateApproval(id: string, patch: Partial<ApprovalRequest>): Promise<ApprovalRequest | null> {
+    const store = await this.readStore();
+    const index = store.approvals.findIndex((approval) => approval.id === id);
+
+    if (index === -1) {
+      return null;
+    }
+
+    const updated = { ...store.approvals[index], ...patch, id, updatedAt: patch.updatedAt ?? new Date().toISOString() };
+    store.approvals[index] = updated;
+    await this.writeStore(store);
+    return cloneApproval(updated);
+  }
+
   async resetStore(): Promise<PlosDataStore> {
     const store = createSeedStore();
     await this.writeStore(store);
@@ -323,6 +377,7 @@ export class JsonFileLifeAdminRepository implements LifeAdminRepository {
     }));
     store.manualTasks = [];
     store.documents = [];
+    store.approvals = [];
     await this.writeStore(store);
   }
 
@@ -414,6 +469,7 @@ export function createSeedStore(seedMessages: LifeAdminMessage[] = mockMessages)
     settings: createDefaultSettings(),
     integrations: createDefaultIntegrations(),
     auditLog: [],
+    approvals: [],
   };
 }
 
@@ -427,6 +483,7 @@ function normalizeStore(store: Partial<PlosDataStore>): PlosDataStore {
     settings: mergeSettings(seed.settings, store.settings ?? {}),
     integrations: normalizeIntegrations(store.integrations ?? seed.integrations),
     auditLog: cloneAuditEvents(store.auditLog ?? []),
+    approvals: cloneApprovals(store.approvals ?? []),
   };
 }
 
@@ -477,6 +534,7 @@ function cloneStore(store: PlosDataStore): PlosDataStore {
     settings: cloneSettings(store.settings),
     integrations: cloneIntegrations(store.integrations),
     auditLog: cloneAuditEvents(store.auditLog),
+    approvals: cloneApprovals(store.approvals),
   };
 }
 
@@ -532,4 +590,12 @@ function cloneAuditEvents(events: AuditEvent[]): AuditEvent[] {
 
 function cloneAuditEvent(event: AuditEvent | null): AuditEvent | null {
   return event ? { ...event, metadata: event.metadata ? { ...event.metadata } : undefined } : null;
+}
+
+function cloneApprovals(approvals: ApprovalRequest[]): ApprovalRequest[] {
+  return approvals.map((approval) => cloneApproval(approval) as ApprovalRequest);
+}
+
+function cloneApproval(approval: ApprovalRequest | null): ApprovalRequest | null {
+  return approval ? { ...approval } : null;
 }
