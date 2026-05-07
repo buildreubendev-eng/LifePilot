@@ -10,10 +10,11 @@ import type { LifeAdminCategory } from "@/lib/types";
 import { usePlosStore } from "@/lib/usePlosStore";
 
 export function InboxView() {
-  const { items, setItemStatus } = usePlosStore();
+  const { items, isLoading, setItemStatus } = usePlosStore();
   const [category, setCategory] = useState<LifeAdminCategory | "all">("all");
   const [isBatchMode, setIsBatchMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [batchProcessing, setBatchProcessing] = useState(false);
 
   const handleToggleBatchMode = () => {
     setIsBatchMode(!isBatchMode);
@@ -30,12 +31,29 @@ export function InboxView() {
     setSelectedIds(next);
   };
 
-  const handleBatchMarkReviewed = () => {
-    selectedIds.forEach((id) => setItemStatus(id, "reviewed"));
+  const handleBatchMarkReviewed = async () => {
+    setBatchProcessing(true);
+    const ids = Array.from(selectedIds);
+    for (const id of ids) {
+      await setItemStatus(id, "reviewed");
+    }
+    setBatchProcessing(false);
     setIsBatchMode(false);
     setSelectedIds(new Set());
   };
+
   const filtered = useMemo(() => (category === "all" ? items : items.filter((item) => item.category === category)), [category, items]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
+          <p className="mt-4 text-sm font-semibold text-stone-600">Loading inbox...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -83,7 +101,13 @@ export function InboxView() {
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 rounded-full bg-stone-900 px-6 py-3 text-white shadow-xl z-50">
           <span className="text-sm font-semibold">{selectedIds.size} selected</span>
           <div className="h-4 w-px bg-stone-700" />
-          <button onClick={handleBatchMarkReviewed} className="text-sm font-bold text-emerald-400 hover:text-emerald-300">Mark Reviewed</button>
+          <button
+            onClick={() => void handleBatchMarkReviewed()}
+            disabled={batchProcessing}
+            className="text-sm font-bold text-emerald-400 hover:text-emerald-300 disabled:opacity-50"
+          >
+            {batchProcessing ? "Processing..." : "Mark Reviewed"}
+          </button>
         </div>
       )}
     </div>

@@ -15,7 +15,9 @@ const sensitiveCategories: LifeAdminCategory[] = ["medical", "bill", "school/fam
 export function SettingsView() {
   const { resetStatuses } = usePlosStore();
   const [settings, setSettings] = useState<UserSettings | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -29,6 +31,10 @@ export function SettingsView() {
       } catch (loadError) {
         if (active) {
           setError(loadError instanceof Error ? loadError.message : "Unable to load settings");
+        }
+      } finally {
+        if (active) {
+          setIsLoading(false);
         }
       }
     }
@@ -58,6 +64,23 @@ export function SettingsView() {
     } catch (updateError) {
       setError(updateError instanceof Error ? updateError.message : "Unable to update settings");
     }
+  }
+
+  async function handleReset() {
+    setResetMessage(null);
+    await resetStatuses();
+    setResetMessage("Demo data has been reset to the initial state.");
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
+          <p className="mt-4 text-sm font-semibold text-stone-600">Loading settings...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -98,7 +121,8 @@ export function SettingsView() {
             ))}
           </div>
           {error ? <p className="mt-3 text-sm font-semibold text-red-700">{error}</p> : null}
-          <button type="button" onClick={resetStatuses} className="mt-5 rounded-md bg-stone-900 px-4 py-3 text-sm font-semibold text-white">
+          {resetMessage ? <p className="mt-3 text-sm font-semibold text-emerald-700">{resetMessage}</p> : null}
+          <button type="button" onClick={() => void handleReset()} className="mt-5 rounded-md bg-stone-900 px-4 py-3 text-sm font-semibold text-white hover:bg-stone-800">
             Reset Local Demo Data
           </button>
         </div>

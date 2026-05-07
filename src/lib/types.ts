@@ -232,3 +232,18 @@ export interface RecommendationAcceptResult {
   task?: ManualTask;
   approval?: ApprovalRequest;
 }
+
+export interface DashboardSummary {
+  lifeAdminScore: number;
+  priorityTasks: LifeAdminTask[];
+  counts: {
+    active: number;
+    overdue: number;
+    dueThisWeek: number;
+    documentsToSave: number;
+    messagesNeedingReply: number;
+    subscriptionWarnings: number;
+    manualTasks: number;
+  };
+}
+

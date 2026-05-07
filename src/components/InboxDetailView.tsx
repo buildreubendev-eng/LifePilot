@@ -14,38 +14,46 @@ import { scoreLifeAdminItem } from "@/lib/prioritization";
 import { usePlosStore } from "@/lib/usePlosStore";
 
 export function InboxDetailView({ id }: { id: string }) {
-  const { items, setItemStatus, performItemAction, error } = usePlosStore();
+  const { items, isLoading, setItemStatus, performItemAction, error } = usePlosStore();
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
   const item = items.find((candidate) => candidate.id === id);
 
   const [isSnoozeOpen, setIsSnoozeOpen] = useState(false);
   const [isTaskOpen, setIsTaskOpen] = useState(false);
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
+          <p className="mt-4 text-sm font-semibold text-stone-600">Loading item...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!item) {
-    return <EmptyState title="Item not found" copy="This inbox item does not exist in the current mock data set." />;
+    return <EmptyState title="Item not found" copy="This inbox item does not exist in the current data set." />;
   }
 
   const currentItem = item;
   const task = scoreLifeAdminItem(item);
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const snoozeDate = tomorrow.toISOString().slice(0, 10);
 
-  async function runAction(action: "snooze" | "save_document" | "create_task") {
-    const result = await performItemAction(
-      currentItem.id,
-      action,
-      action === "snooze" ? { snoozedUntil: snoozeDate } : action === "create_task" ? { taskTitle: task.title } : {},
-    );
+  async function runAction(action: "snooze" | "save_document" | "create_task", payload: Record<string, string> = {}) {
+    setActionLoading(true);
+    setActionMessage(null);
+    const result = await performItemAction(currentItem.id, action, payload);
 
     if (result) {
-      const labels = {
-        snooze: `Snoozed until ${snoozeDate}.`,
+      const labels: Record<string, string> = {
+        snooze: `Snoozed until ${payload.snoozedUntil ?? "later"}.`,
         save_document: "Document saved to records.",
         create_task: "Task created from this item.",
       };
       setActionMessage(labels[action]);
     }
+    setActionLoading(false);
   }
 
   return (
@@ -160,16 +168,34 @@ export function InboxDetailView({ id }: { id: string }) {
               </div>
             ) : null}
             <div className="grid gap-2 sm:grid-cols-3">
-              <button type="button" onClick={() => setIsSnoozeOpen(true)} className="rounded-md bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200 hover:bg-stone-50" aria-label="Snooze item">
+              <button
+                type="button"
+                onClick={() => setIsSnoozeOpen(true)}
+                disabled={actionLoading}
+                className="rounded-md bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200 hover:bg-stone-50 disabled:opacity-50"
+                aria-label="Snooze item"
+              >
                 Snooze
               </button>
               {item.documentSaveRecommended && (
-                <button type="button" onClick={() => void runAction("save_document")} className="rounded-md bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200 hover:bg-stone-50" aria-label="Save document">
-                  Save Document
+                <button
+                  type="button"
+                  onClick={() => void runAction("save_document")}
+                  disabled={actionLoading || !!item.documentSavedAt}
+                  className="rounded-md bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200 hover:bg-stone-50 disabled:opacity-50"
+                  aria-label="Save document"
+                >
+                  {item.documentSavedAt ? "Document Saved" : "Save Document"}
                 </button>
               )}
-              <button type="button" onClick={() => setIsTaskOpen(true)} className="rounded-md bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200 hover:bg-stone-50" aria-label="Create task">
-                Create Task
+              <button
+                type="button"
+                onClick={() => setIsTaskOpen(true)}
+                disabled={actionLoading || !!item.taskCreatedAt}
+                className="rounded-md bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200 hover:bg-stone-50 disabled:opacity-50"
+                aria-label="Create task"
+              >
+                {item.taskCreatedAt ? "Task Created" : "Create Task"}
               </button>
             </div>
             <div className="mt-2">
@@ -182,8 +208,8 @@ export function InboxDetailView({ id }: { id: string }) {
         <SnoozeModal
           isOpen={isSnoozeOpen}
           onClose={() => setIsSnoozeOpen(false)}
-          onConfirm={(_date) => {
-            void runAction("snooze");
+          onConfirm={(date) => {
+            void runAction("snooze", { snoozedUntil: date });
             setIsSnoozeOpen(false);
           }}
         />
@@ -193,8 +219,8 @@ export function InboxDetailView({ id }: { id: string }) {
           isOpen={isTaskOpen}
           onClose={() => setIsTaskOpen(false)}
           defaultTitle={item.title}
-          onConfirm={(_title, _notes) => {
-            void runAction("create_task");
+          onConfirm={(title, notes) => {
+            void runAction("create_task", { taskTitle: title, ...(notes ? { notes } : {}) });
             setIsTaskOpen(false);
           }}
         />

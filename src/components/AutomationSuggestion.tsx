@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function AutomationSuggestion({ itemTitle, category }: { itemTitle: string; category: string }) {
+export function AutomationSuggestion({ category }: { itemTitle: string; category: string }) {
   const [status, setStatus] = useState<"pending" | "approved" | "declined">("pending");
 
   if (status === "declined") return null;
