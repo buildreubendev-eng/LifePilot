@@ -53,7 +53,7 @@ export function DashboardView() {
         <div className="rounded-lg bg-stone-900 p-6 text-white">
           <p className="text-sm font-semibold uppercase tracking-wide text-emerald-200">Personal command center</p>
           <h1 className="mt-3 max-w-3xl text-4xl font-black leading-tight sm:text-5xl">
-            Reuben&apos;s personal life operating system, starting with today&apos;s life admin.
+            Reuben&apos;s Personal Life Operating System, starting with today&apos;s life admin.
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-stone-200">
             PLOS turns mock emails, calendar events, bills, renewals, receipts, and reminders into a focused action plan for the first MVP slice.

@@ -2,6 +2,7 @@
 
 import { ItemCard } from "@/components/ItemCard";
 import { Section } from "@/components/Section";
+import { ConflictAlert } from "@/components/ConflictAlert";
 import { createWeeklyBriefing } from "@/lib/prioritization";
 import { usePlosStore } from "@/lib/usePlosStore";
 
@@ -60,14 +61,15 @@ export function WeeklyBriefingView() {
       </div>
 
       <Section title="Schedule Conflicts">
-        <div className="grid gap-3 md:grid-cols-2">
-          {briefing.scheduleConflicts.map((conflict) => (
-            <div key={conflict.map((item) => item.id).join("-")} className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-              <p className="font-semibold text-amber-950">Potential overlap</p>
-              <p className="mt-2 text-sm text-amber-900">{conflict.map((item) => item.title).join(" and ")}</p>
-            </div>
-          ))}
-        </div>
+        {briefing.scheduleConflicts.length === 0 ? (
+          <div className="rounded-lg border border-stone-200 bg-white p-4 text-sm text-stone-600">Your schedule is clear of conflicts.</div>
+        ) : (
+          <div className="grid gap-3 md:grid-cols-2">
+            {briefing.scheduleConflicts.map((conflict) => (
+              <ConflictAlert key={conflict.map((item) => item.id).join("-")} conflict={conflict} />
+            ))}
+          </div>
+        )}
       </Section>
 
       <Section title="Documents That Should Be Saved">

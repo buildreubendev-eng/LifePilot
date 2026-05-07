@@ -14,7 +14,7 @@ const navigation = [
   { href: "/integrations", label: "Integrations" },
   { href: "/ingest", label: "Ingest" },
   { href: "/activity", label: "Activity" },
-  { href: "/settings", label: "Settings" },
+  { href: "/settings", label: "Preferences & Privacy" },
 ];
 
 export function AppFrame({ children }: { children: React.ReactNode }) {

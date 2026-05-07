@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { PrivacyPanel } from "@/components/PrivacyPanel";
 import { fetchJson } from "@/lib/apiClient";
 import type { LifeAdminCategory, UserSettings } from "@/lib/types";
+import { ConnectorsPanel } from "@/components/ConnectorsPanel";
+import { LearningPreferencesPanel } from "@/components/LearningPreferencesPanel";
+import { BriefingPreferencesPanel } from "@/components/BriefingPreferencesPanel";
+import { Checkbox } from "@/components/ui/checkbox";
 import { usePlosStore } from "@/lib/usePlosStore";
 
 const sensitiveCategories: LifeAdminCategory[] = ["medical", "bill", "school/family", "personal reply"];
@@ -59,7 +63,7 @@ export function SettingsView() {
   return (
     <div>
       <section className="py-4">
-        <h1 className="text-4xl font-black text-stone-950">Settings</h1>
+        <h1 className="text-4xl font-black text-stone-950">Preferences & Privacy</h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-stone-600">
           Privacy, integration readiness, and local demo controls for the MVP.
         </p>
@@ -77,17 +81,18 @@ export function SettingsView() {
             These high-risk actions are intentionally approval-gated in the backend.
           </p>
         </div>
+        <ConnectorsPanel />
+        <LearningPreferencesPanel />
+        <BriefingPreferencesPanel />
         <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
           <h2 className="text-lg font-bold text-stone-950">Sensitive Categories</h2>
           <div className="mt-4 grid gap-3">
             {sensitiveCategories.map((category) => (
               <label key={category} className="flex items-center justify-between rounded-lg bg-stone-50 p-3">
                 <span className="font-semibold capitalize text-stone-800">{category}</span>
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={!(settings?.disabledCategories.includes(category) ?? false)}
-                  onChange={() => void toggleCategory(category)}
-                  className="h-5 w-5 accent-stone-900"
+                  onCheckedChange={() => void toggleCategory(category)}
                 />
               </label>
             ))}

@@ -4,6 +4,13 @@ import type { LifeAdminStatus } from "@/lib/types";
 
 const statuses: LifeAdminStatus[] = ["new", "reviewed", "completed", "ignored"];
 
+const labelMap: Record<LifeAdminStatus, string> = {
+  new: "New",
+  reviewed: "Reviewed",
+  completed: "Mark Complete",
+  ignored: "Ignore",
+};
+
 export function StatusControl({
   value,
   onChange,
@@ -22,7 +29,7 @@ export function StatusControl({
             value === status ? "bg-stone-900 text-white" : "bg-white text-stone-700 ring-1 ring-stone-200 hover:bg-stone-50"
           }`}
         >
-          {status}
+          {labelMap[status]}
         </button>
       ))}
     </div>

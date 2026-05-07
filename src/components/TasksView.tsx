@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ItemCard } from "@/components/ItemCard";
+import { EmptyState } from "@/components/EmptyState";
 import { Section } from "@/components/Section";
 import { fetchJson } from "@/lib/apiClient";
 import { generateTasks } from "@/lib/prioritization";
@@ -50,11 +51,15 @@ export function TasksView() {
       </section>
       {error ? <p className="rounded-md bg-red-100 px-3 py-2 text-sm font-semibold text-red-800">{error}</p> : null}
       <Section title="Ranked Action List">
-        <div className="grid gap-3">
-          {tasks.map((task) => (
-            <ItemCard key={task.id} task={task} />
-          ))}
-        </div>
+        {tasks.length === 0 ? (
+          <EmptyState title="All clear" copy="No tasks pending. Enjoy your day." />
+        ) : (
+          <div className="grid gap-3">
+            {tasks.map((task) => (
+              <ItemCard key={task.id} task={task} />
+            ))}
+          </div>
+        )}
       </Section>
     </div>
   );
