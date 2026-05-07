@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model LifeAdminMessage {
+  id                      String            @id
+  title                   String
+  category                String
+  source                  String
+  sender                  String
+  receivedAt              DateTime
+  dueDate                 DateTime?
+  priority                String
+  suggestedAction         String
+  confidence              Float
+  status                  String
+  originalMessage         String
+  flaggedReason           String
+  extractedFieldsJson     String            @default("[]")
+  financialImpact         Float?
+  documentSaveRecommended Boolean           @default(false)
+  documentSavedAt         DateTime?
+  needsReply              Boolean           @default(false)
+  appointmentStart        DateTime?
+  snoozedUntil            DateTime?
+  taskCreatedAt           DateTime?
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+  documents               DocumentRecord[]
+  tasks                   ManualTask[]
+  approvals               ApprovalRequest[]
+
+  @@index([category])
+  @@index([status])
+  @@index([dueDate])
+  @@index([priority])
+}
+
+model ManualTask {
+  id              String            @id
+  sourceMessageId String?
+  title           String
+  category        String
+  dueDate         DateTime?
+  priority        String
+  status          String
+  suggestedAction String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  snoozedUntil    DateTime?
+  sourceMessage   LifeAdminMessage? @relation(fields: [sourceMessageId], references: [id], onDelete: SetNull)
+
+  @@index([sourceMessageId])
+  @@index([category])
+  @@index([status])
+  @@index([dueDate])
+  @@index([priority])
+}
+
+model DocumentRecord {
+  id              String           @id
+  sourceMessageId String
+  title           String
+  category        String
+  source          String
+  status          String
+  savedAt         DateTime
+  notes           String?
+  sourceMessage   LifeAdminMessage @relation(fields: [sourceMessageId], references: [id], onDelete: Cascade)
+
+  @@index([sourceMessageId])
+  @@index([category])
+  @@index([status])
+  @@index([savedAt])
+}
+
+model UserSettings {
+  id                      String   @id @default("default")
+  disabledCategoriesJson  String   @default("[]")
+  approvalSendingMessages Boolean  @default(true)
+  approvalPayments        Boolean  @default(true)
+  approvalCancellations   Boolean  @default(true)
+  weeklyBriefingDay       String   @default("Monday")
+  timezone                String   @default("America/Chicago")
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model IntegrationConnection {
+  provider             String    @id
+  label                String
+  status               String
+  permissionScopesJson String    @default("[]")
+  lastSyncAt           DateTime?
+  connectedAt          DateTime?
+  notes                String
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([status])
+}
+
+model AuditEvent {
+  id           String   @id
+  type         String
+  entityType   String
+  entityId     String
+  summary      String
+  createdAt    DateTime @default(now())
+  metadataJson String?
+
+  @@index([type])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+model ApprovalRequest {
+  id              String            @id
+  actionType      String
+  sourceMessageId String?
+  title           String
+  description     String
+  riskLevel       String
+  status          String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  reviewedAt      DateTime?
+  reviewerNote    String?
+  sourceMessage   LifeAdminMessage? @relation(fields: [sourceMessageId], references: [id], onDelete: SetNull)
+
+  @@index([actionType])
+  @@index([status])
+  @@index([sourceMessageId])
+  @@index([riskLevel])
+}
+
+model RawLifeAdminMessage {
+  id         String   @id
+  provider   String
+  source     String
+  sender     String
+  subject    String
+  body       String
+  receivedAt DateTime
+  externalId String?
+  createdAt  DateTime @default(now())
+
+  @@index([provider])
+  @@index([source])
+  @@index([receivedAt])
+}
+
+model IngestionRun {
+  id                 String   @id
+  provider           String
+  status             String
+  startedAt          DateTime
+  completedAt        DateTime
+  inputCount         Int
+  createdItemIdsJson String   @default("[]")
+  notes              String?
+
+  @@index([provider])
+  @@index([status])
+  @@index([startedAt])
+}

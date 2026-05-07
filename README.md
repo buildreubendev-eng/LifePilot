@@ -26,6 +26,7 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - `src/lib/usePlosStore.ts`: local browser state for item statuses.
 - `src/server/lifeAdminRepository.ts`: repository boundary for current mock data and future persistence.
 - `src/server/lifeAdminService.ts`: backend service for items, status updates, generated tasks, dashboard summary, and weekly briefing.
+- `prisma/schema.prisma`: SQLite database schema for the next persistent repository.
 - `src/components`: reusable cards, badges, filters, status controls, privacy panel, and page views.
 - `src/app`: Next.js App Router pages.
 - `src/lib/apiClient.ts`: small browser fetch helper for typed backend calls.
@@ -59,6 +60,18 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - `POST /api/life-admin/reset`: reset the local MVP data store back to the mock seed state.
 
 Local MVP persistence is stored in `.data/plos-store.json`, which is ignored by Git. This keeps the backend stateful without introducing a database dependency before the integration model settles.
+
+## Prisma SQLite Setup
+
+Prisma is installed and the SQLite schema is defined in `prisma/schema.prisma`. The current app still uses the JSON repository; Prisma is ready for the next repository implementation milestone.
+
+```bash
+copy .env.example .env
+npm run db:generate
+npm run db:push
+```
+
+The schema includes tables for life-admin messages, manual tasks, documents, settings, integrations, audit events, approvals, raw ingested messages, and ingestion runs.
 
 ## Run The App
 
