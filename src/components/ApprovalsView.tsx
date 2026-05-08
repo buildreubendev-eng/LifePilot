@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { MetricCard } from "@/components/MetricCard";
 import { Section } from "@/components/Section";
@@ -15,35 +15,45 @@ export function ApprovalsView() {
   const [title, setTitle] = useState("Reply to provider");
   const [description, setDescription] = useState("Draft response requires approval before sending.");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  async function loadApprovals() {
+  const loadApprovals = useCallback(async () => {
     const body = await fetchJson<{ approvals: ApprovalRequest[] }>("/api/life-admin/approvals");
     setApprovals(body.approvals);
-  }
+  }, []);
 
   useEffect(() => {
     let active = true;
 
-    async function loadInitialApprovals() {
+    async function init() {
       try {
-        const body = await fetchJson<{ approvals: ApprovalRequest[] }>("/api/life-admin/approvals");
-        if (active) {
-          setApprovals(body.approvals);
-        }
+        await loadApprovals();
       } catch (loadError) {
         if (active) {
           setError(loadError instanceof Error ? loadError.message : "Unable to load approvals");
         }
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
       }
     }
 
-    void loadInitialApprovals();
+    void init();
     return () => {
       active = false;
     };
-  }, []);
+  }, [loadApprovals]);
 
   async function createApproval() {
+    if (!title.trim()) {
+      setError("Title is required.");
+      return;
+    }
+    setIsCreating(true);
     try {
       await fetchJson<{ approval: ApprovalRequest }>("/api/life-admin/approvals", {
         method: "POST",
@@ -51,12 +61,17 @@ export function ApprovalsView() {
       });
       await loadApprovals();
       setError(null);
+      setSuccessMessage("Approval request created.");
+      setTimeout(() => setSuccessMessage(null), 4000);
     } catch (createError) {
       setError(createError instanceof Error ? createError.message : "Unable to create approval");
+    } finally {
+      setIsCreating(false);
     }
   }
 
   async function reviewApproval(id: string, status: "approved" | "rejected") {
+    setReviewingId(id);
     try {
       await fetchJson<{ approval: ApprovalRequest }>(`/api/life-admin/approvals/${id}`, {
         method: "PATCH",
@@ -64,12 +79,27 @@ export function ApprovalsView() {
       });
       await loadApprovals();
       setError(null);
+      setSuccessMessage(`Request ${status}.`);
+      setTimeout(() => setSuccessMessage(null), 4000);
     } catch (reviewError) {
       setError(reviewError instanceof Error ? reviewError.message : "Unable to review approval");
+    } finally {
+      setReviewingId(null);
     }
   }
 
   const pending = approvals.filter((approval) => approval.status === "pending");
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
+          <p className="mt-4 text-sm font-semibold text-stone-600">Loading approvals...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -85,6 +115,9 @@ export function ApprovalsView() {
         <MetricCard label="Approved" value={approvals.filter((approval) => approval.status === "approved").length} detail="Reviewed and allowed" />
         <MetricCard label="Rejected" value={approvals.filter((approval) => approval.status === "rejected").length} detail="Stopped by the user" />
       </div>
+
+      {successMessage ? <div className="mt-4 rounded-md bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-800">{successMessage}</div> : null}
+      {error ? <div className="mt-4 rounded-md bg-red-100 px-3 py-2 text-sm font-semibold text-red-800">{error}</div> : null}
 
       <Section title="Create Approval Request">
         <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
@@ -107,11 +140,15 @@ export function ApprovalsView() {
               Description
               <input value={description} onChange={(event) => setDescription(event.target.value)} className="rounded-md border border-stone-300 px-3 py-2" />
             </label>
-            <button type="button" onClick={() => void createApproval()} className="rounded-md bg-stone-900 px-4 py-2 text-sm font-semibold text-white">
-              Create
+            <button
+              type="button"
+              onClick={() => void createApproval()}
+              disabled={isCreating}
+              className="rounded-md bg-stone-900 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-50"
+            >
+              {isCreating ? "Creating..." : "Create"}
             </button>
           </div>
-          {error ? <p className="mt-3 text-sm font-semibold text-red-700">{error}</p> : null}
         </div>
       </Section>
 
@@ -121,23 +158,52 @@ export function ApprovalsView() {
         ) : (
           <div className="grid gap-3">
             {approvals.map((approval) => (
-              <div key={approval.id} className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm">
+              <div key={approval.id} className={`rounded-lg border p-4 shadow-sm ${
+                approval.status === "approved" ? "border-emerald-200 bg-emerald-50/30" :
+                approval.status === "rejected" ? "border-red-200 bg-red-50/30" :
+                "border-stone-200 bg-white"
+              }`}>
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div>
                     <div className="flex flex-wrap gap-2">
                       <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-semibold capitalize text-stone-700">{approval.actionType.replaceAll("_", " ")}</span>
-                      <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold capitalize text-amber-800">{approval.riskLevel} risk</span>
-                      <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold capitalize text-blue-800">{approval.status}</span>
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
+                        approval.riskLevel === "high" ? "bg-red-100 text-red-800" :
+                        approval.riskLevel === "medium" ? "bg-amber-100 text-amber-800" :
+                        "bg-emerald-100 text-emerald-800"
+                      }`}>{approval.riskLevel} risk</span>
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
+                        approval.status === "approved" ? "bg-emerald-100 text-emerald-800" :
+                        approval.status === "rejected" ? "bg-red-100 text-red-800" :
+                        "bg-blue-100 text-blue-800"
+                      }`}>{approval.status}</span>
                     </div>
                     <h3 className="mt-3 text-base font-bold text-stone-950">{approval.title}</h3>
                     <p className="mt-2 text-sm leading-6 text-stone-600">{approval.description}</p>
+                    {approval.reviewedAt && (
+                      <p className="mt-1 text-xs text-stone-500">
+                        Reviewed: {new Date(approval.reviewedAt).toLocaleString()}
+                        {approval.reviewerNote ? ` — "${approval.reviewerNote}"` : ""}
+                      </p>
+                    )}
+                    <p className="mt-1 text-xs text-stone-400">Created: {new Date(approval.createdAt).toLocaleString()}</p>
                   </div>
                   {approval.status === "pending" ? (
-                    <div className="flex gap-2">
-                      <button type="button" onClick={() => void reviewApproval(approval.id, "approved")} className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white">
-                        Approve
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => void reviewApproval(approval.id, "approved")}
+                        disabled={reviewingId !== null}
+                        className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                      >
+                        {reviewingId === approval.id ? "..." : "Approve"}
                       </button>
-                      <button type="button" onClick={() => void reviewApproval(approval.id, "rejected")} className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-stone-700 ring-1 ring-stone-200">
+                      <button
+                        type="button"
+                        onClick={() => void reviewApproval(approval.id, "rejected")}
+                        disabled={reviewingId !== null}
+                        className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-stone-700 ring-1 ring-stone-200 hover:bg-stone-50 disabled:opacity-50"
+                      >
                         Reject
                       </button>
                     </div>

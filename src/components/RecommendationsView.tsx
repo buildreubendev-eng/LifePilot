@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { MetricCard } from "@/components/MetricCard";
 import { Section } from "@/components/Section";
@@ -11,35 +11,39 @@ export function RecommendationsView() {
   const [recommendations, setRecommendations] = useState<ActionRecommendation[]>([]);
   const [accepted, setAccepted] = useState<RecommendationAcceptResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
-  async function loadRecommendations() {
+  const loadRecommendations = useCallback(async () => {
     const body = await fetchJson<{ recommendations: ActionRecommendation[] }>("/api/life-admin/recommendations");
     setRecommendations(body.recommendations);
-  }
+  }, []);
 
   useEffect(() => {
     let active = true;
 
-    async function loadInitialRecommendations() {
+    async function init() {
       try {
-        const body = await fetchJson<{ recommendations: ActionRecommendation[] }>("/api/life-admin/recommendations");
-        if (active) {
-          setRecommendations(body.recommendations);
-        }
+        await loadRecommendations();
       } catch (loadError) {
         if (active) {
           setError(loadError instanceof Error ? loadError.message : "Unable to load recommendations");
         }
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
       }
     }
 
-    void loadInitialRecommendations();
+    void init();
     return () => {
       active = false;
     };
-  }, []);
+  }, [loadRecommendations]);
 
   async function acceptRecommendation(id: string) {
+    setProcessingId(id);
     try {
       const result = await fetchJson<RecommendationAcceptResult>(`/api/life-admin/recommendations/${id}/accept`, {
         method: "POST",
@@ -49,7 +53,20 @@ export function RecommendationsView() {
       setError(null);
     } catch (acceptError) {
       setError(acceptError instanceof Error ? acceptError.message : "Unable to accept recommendation");
+    } finally {
+      setProcessingId(null);
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
+          <p className="mt-4 text-sm font-semibold text-stone-600">Loading recommendations...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -69,8 +86,14 @@ export function RecommendationsView() {
       </div>
 
       {accepted ? (
-        <div className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
-          Accepted: {accepted.recommendation.title}
+        <div className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+          <div className="flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-600"><path d="M20 6 9 17l-5-5"/></svg>
+            <span className="text-sm font-semibold text-emerald-800">Accepted: {accepted.recommendation.title}</span>
+          </div>
+          {accepted.approval && <p className="mt-1 text-sm text-emerald-700">Approval request created — review it on the Approvals page.</p>}
+          {accepted.document && <p className="mt-1 text-sm text-emerald-700">Document saved to your vault.</p>}
+          {accepted.task && <p className="mt-1 text-sm text-emerald-700">Task added to your action list.</p>}
         </div>
       ) : null}
       {error ? <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">{error}</div> : null}
@@ -88,23 +111,35 @@ export function RecommendationsView() {
                       <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-semibold capitalize text-stone-700">
                         {recommendation.actionType.replaceAll("_", " ")}
                       </span>
-                      <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold capitalize text-amber-800">
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
+                        recommendation.riskLevel === "high" ? "bg-red-100 text-red-800" :
+                        recommendation.riskLevel === "medium" ? "bg-amber-100 text-amber-800" :
+                        "bg-emerald-100 text-emerald-800"
+                      }`}>
                         {recommendation.riskLevel} risk
                       </span>
-                      <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold capitalize text-blue-800">
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
+                        recommendation.priority === "urgent" ? "bg-red-100 text-red-800" :
+                        recommendation.priority === "high" ? "bg-amber-100 text-amber-800" :
+                        "bg-blue-100 text-blue-800"
+                      }`}>
                         {recommendation.priority}
                       </span>
                     </div>
                     <h2 className="mt-3 text-lg font-bold text-stone-950">{recommendation.title}</h2>
                     <p className="mt-2 text-sm leading-6 text-stone-600">{recommendation.description}</p>
                     <p className="mt-2 text-sm font-semibold text-stone-700">{recommendation.reason}</p>
+                    {recommendation.dueDate && (
+                      <p className="mt-1 text-xs text-stone-500">Due: {new Date(recommendation.dueDate + "T12:00:00").toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}</p>
+                    )}
                   </div>
                   <button
                     type="button"
                     onClick={() => void acceptRecommendation(recommendation.id)}
-                    className="rounded-md bg-stone-900 px-4 py-3 text-sm font-semibold text-white"
+                    disabled={processingId !== null}
+                    className="shrink-0 rounded-md bg-stone-900 px-4 py-3 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-50"
                   >
-                    {recommendation.acceptLabel}
+                    {processingId === recommendation.id ? "Processing..." : recommendation.acceptLabel}
                   </button>
                 </div>
               </div>
