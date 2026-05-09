@@ -145,7 +145,7 @@ CREATE INDEX "LifeAdminMessage_dueDate_idx" ON "LifeAdminMessage"("dueDate");
 CREATE INDEX "LifeAdminMessage_priority_idx" ON "LifeAdminMessage"("priority");
 
 -- CreateIndex
-CREATE INDEX "ManualTask_sourceMessageId_idx" ON "ManualTask"("sourceMessageId");
+CREATE UNIQUE INDEX "ManualTask_sourceMessageId_key" ON "ManualTask"("sourceMessageId");
 
 -- CreateIndex
 CREATE INDEX "ManualTask_category_idx" ON "ManualTask"("category");
@@ -160,7 +160,7 @@ CREATE INDEX "ManualTask_dueDate_idx" ON "ManualTask"("dueDate");
 CREATE INDEX "ManualTask_priority_idx" ON "ManualTask"("priority");
 
 -- CreateIndex
-CREATE INDEX "DocumentRecord_sourceMessageId_idx" ON "DocumentRecord"("sourceMessageId");
+CREATE UNIQUE INDEX "DocumentRecord_sourceMessageId_key" ON "DocumentRecord"("sourceMessageId");
 
 -- CreateIndex
 CREATE INDEX "DocumentRecord_category_idx" ON "DocumentRecord"("category");
@@ -196,6 +196,9 @@ CREATE INDEX "ApprovalRequest_sourceMessageId_idx" ON "ApprovalRequest"("sourceM
 CREATE INDEX "ApprovalRequest_riskLevel_idx" ON "ApprovalRequest"("riskLevel");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "ApprovalRequest_sourceMessageId_actionType_status_key" ON "ApprovalRequest"("sourceMessageId", "actionType", "status");
+
+-- CreateIndex
 CREATE INDEX "RawLifeAdminMessage_provider_idx" ON "RawLifeAdminMessage"("provider");
 
 -- CreateIndex
@@ -203,6 +206,9 @@ CREATE INDEX "RawLifeAdminMessage_source_idx" ON "RawLifeAdminMessage"("source")
 
 -- CreateIndex
 CREATE INDEX "RawLifeAdminMessage_receivedAt_idx" ON "RawLifeAdminMessage"("receivedAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "RawLifeAdminMessage_provider_externalId_key" ON "RawLifeAdminMessage"("provider", "externalId");
 
 -- CreateIndex
 CREATE INDEX "IngestionRun_provider_idx" ON "IngestionRun"("provider");

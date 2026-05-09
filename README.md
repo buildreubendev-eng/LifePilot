@@ -11,6 +11,7 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - Item detail view with original message, extracted fields, flagged reason, suggested next action, status controls, and MVP action buttons.
 - Task generation and prioritization service using due date proximity, financial impact, category importance, confidence, and overdue status.
 - Recommendation engine that turns active items into safe next moves, approval requests, saved documents, and tasks.
+- Idempotent backend actions for duplicate clicks, retried recommendation accepts, and repeated ingestion payloads.
 - Weekly Briefing generated from the same mock data.
 - Documents, Approvals, Integrations, Ingest, Activity, and Settings pages with no placeholder-only routes.
 - Local status changes persisted in browser localStorage.
@@ -26,6 +27,7 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - `src/lib/usePlosStore.ts`: local browser state for item statuses.
 - `src/server/lifeAdminRepository.ts`: repository boundary for current mock data and future persistence.
 - `src/server/lifeAdminService.ts`: backend service for items, status updates, generated tasks, dashboard summary, and weekly briefing.
+- `src/server/rawMessageParser.ts`: mock connector parsing boundary that turns raw provider messages into normalized PLOS items.
 - `prisma/schema.prisma`: SQLite database schema for durable persistence.
 - `prisma/migrations/00000000000000_init/migration.sql`: initial SQLite migration for deployable Prisma mode.
 - `src/components`: reusable cards, badges, filters, status controls, privacy panel, and page views.
@@ -55,6 +57,7 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - `PATCH /api/life-admin/settings`: update disabled categories, approval requirements, briefing day, or timezone.
 - `GET /api/life-admin/integrations`: list future connector states.
 - `PATCH /api/life-admin/integrations/:provider`: update future connector state for Gmail, Calendar, Plaid, or health.
+- `POST /api/life-admin/integrations/:provider/sync`: run an idempotent mock provider sync for future connector UX.
 - `GET /api/life-admin/audit`: list backend audit events.
 - `GET /api/life-admin/approvals`: list approval requests for sensitive actions.
 - `POST /api/life-admin/approvals`: create an approval request for `send_message`, `make_payment`, or `cancel_subscription`.

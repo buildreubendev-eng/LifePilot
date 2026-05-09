@@ -173,4 +173,42 @@ describe("PrismaLifeAdminRepository", () => {
     expect(auditLog.filter((event) => event.type === "document_saved")).toHaveLength(1);
     expect(auditLog.filter((event) => event.type === "approval_created")).toHaveLength(1);
   });
+
+  it("deduplicates retried ingestion in Prisma mode", async () => {
+    const first = await service.ingestRawMessages({
+      provider: "gmail",
+      messages: [
+        {
+          id: "raw-prisma-retry-first",
+          externalId: "gmail-prisma-retry-001",
+          source: "Gmail",
+          sender: "CloudNest",
+          subject: "Your trial ends May 8",
+          body: "Your premium plan trial ends May 8 and will renew for $19.99/month.",
+          receivedAt: "2026-05-05T10:00:00-05:00",
+        },
+      ],
+    });
+    const second = await service.ingestRawMessages({
+      provider: "gmail",
+      messages: [
+        {
+          id: "raw-prisma-retry-second",
+          externalId: "gmail-prisma-retry-001",
+          source: "Gmail",
+          sender: "CloudNest",
+          subject: "Your trial ends May 8",
+          body: "Your premium plan trial ends May 8 and will renew for $19.99/month.",
+          receivedAt: "2026-05-05T10:00:00-05:00",
+        },
+      ],
+    });
+    const [rawMessages, runs] = await Promise.all([repository.listRawMessages(), repository.listIngestionRuns()]);
+
+    expect(first.run.createdItemIds).toEqual(["msg-raw-prisma-retry-first"]);
+    expect(second.items[0]?.id).toBe("msg-raw-prisma-retry-first");
+    expect(second.run.createdItemIds).toHaveLength(0);
+    expect(rawMessages.filter((message) => message.externalId === "gmail-prisma-retry-001")).toHaveLength(1);
+    expect(runs).toHaveLength(2);
+  });
 });

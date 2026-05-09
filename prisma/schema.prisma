@@ -55,7 +55,7 @@ model ManualTask {
   snoozedUntil    DateTime?
   sourceMessage   LifeAdminMessage? @relation(fields: [sourceMessageId], references: [id], onDelete: SetNull)
 
-  @@index([sourceMessageId])
+  @@unique([sourceMessageId])
   @@index([category])
   @@index([status])
   @@index([dueDate])
@@ -73,7 +73,7 @@ model DocumentRecord {
   notes           String?
   sourceMessage   LifeAdminMessage @relation(fields: [sourceMessageId], references: [id], onDelete: Cascade)
 
-  @@index([sourceMessageId])
+  @@unique([sourceMessageId])
   @@index([category])
   @@index([status])
   @@index([savedAt])
@@ -137,6 +137,7 @@ model ApprovalRequest {
   @@index([status])
   @@index([sourceMessageId])
   @@index([riskLevel])
+  @@unique([sourceMessageId, actionType, status])
 }
 
 model RawLifeAdminMessage {
@@ -153,6 +154,7 @@ model RawLifeAdminMessage {
   @@index([provider])
   @@index([source])
   @@index([receivedAt])
+  @@unique([provider, externalId])
 }
 
 model IngestionRun {

@@ -559,10 +559,19 @@ export class PrismaLifeAdminRepository implements LifeAdminRepository {
   }
 
   async createManualTask(task: ManualTask): Promise<ManualTask> {
-    const created = await this.prisma.manualTask.create({
-      data: manualTaskToPrismaCreate(task),
-    });
-    return prismaManualTaskToManualTask(created);
+    try {
+      const created = await this.prisma.manualTask.create({
+        data: manualTaskToPrismaCreate(task),
+      });
+      return prismaManualTaskToManualTask(created);
+    } catch (error) {
+      if (isPrismaUniqueConstraint(error) && task.sourceMessageId) {
+        const existing = await this.prisma.manualTask.findFirst({ where: { sourceMessageId: task.sourceMessageId } });
+        if (existing) return prismaManualTaskToManualTask(existing);
+      }
+
+      throw error;
+    }
   }
 
   async updateManualTask(id: string, patch: Partial<ManualTask>): Promise<ManualTask | null> {
@@ -585,12 +594,21 @@ export class PrismaLifeAdminRepository implements LifeAdminRepository {
   }
 
   async upsertDocument(document: DocumentRecord): Promise<DocumentRecord> {
-    const saved = await this.prisma.documentRecord.upsert({
-      where: { id: document.id },
-      create: documentToPrismaCreate(document),
-      update: documentToPrismaUpdate(document),
-    });
-    return prismaDocumentToDocumentRecord(saved);
+    try {
+      const saved = await this.prisma.documentRecord.upsert({
+        where: { id: document.id },
+        create: documentToPrismaCreate(document),
+        update: documentToPrismaUpdate(document),
+      });
+      return prismaDocumentToDocumentRecord(saved);
+    } catch (error) {
+      if (isPrismaUniqueConstraint(error)) {
+        const existing = await this.prisma.documentRecord.findUnique({ where: { sourceMessageId: document.sourceMessageId } });
+        if (existing) return prismaDocumentToDocumentRecord(existing);
+      }
+
+      throw error;
+    }
   }
 
   async getSettings(): Promise<UserSettings> {
@@ -654,10 +672,25 @@ export class PrismaLifeAdminRepository implements LifeAdminRepository {
   }
 
   async createApproval(approval: ApprovalRequest): Promise<ApprovalRequest> {
-    const created = await this.prisma.approvalRequest.create({
-      data: approvalToPrismaCreate(approval),
-    });
-    return prismaApprovalToApprovalRequest(created);
+    try {
+      const created = await this.prisma.approvalRequest.create({
+        data: approvalToPrismaCreate(approval),
+      });
+      return prismaApprovalToApprovalRequest(created);
+    } catch (error) {
+      if (isPrismaUniqueConstraint(error) && approval.sourceMessageId) {
+        const existing = await this.prisma.approvalRequest.findFirst({
+          where: {
+            sourceMessageId: approval.sourceMessageId,
+            actionType: approval.actionType,
+            status: approval.status,
+          },
+        });
+        if (existing) return prismaApprovalToApprovalRequest(existing);
+      }
+
+      throw error;
+    }
   }
 
   async updateApproval(id: string, patch: Partial<ApprovalRequest>): Promise<ApprovalRequest | null> {
@@ -680,10 +713,26 @@ export class PrismaLifeAdminRepository implements LifeAdminRepository {
   }
 
   async createRawMessage(message: RawLifeAdminMessage): Promise<RawLifeAdminMessage> {
-    const created = await this.prisma.rawLifeAdminMessage.create({
-      data: rawMessageToPrismaCreate(message),
-    });
-    return prismaRawMessageToRawLifeAdminMessage(created);
+    try {
+      const created = await this.prisma.rawLifeAdminMessage.create({
+        data: rawMessageToPrismaCreate(message),
+      });
+      return prismaRawMessageToRawLifeAdminMessage(created);
+    } catch (error) {
+      if (isPrismaUniqueConstraint(error)) {
+        const existing = await this.prisma.rawLifeAdminMessage.findFirst({
+          where: {
+            OR: [
+              { id: message.id },
+              ...(message.externalId ? [{ provider: message.provider, externalId: message.externalId }] : []),
+            ],
+          },
+        });
+        if (existing) return prismaRawMessageToRawLifeAdminMessage(existing);
+      }
+
+      throw error;
+    }
   }
 
   async listIngestionRuns(): Promise<IngestionRun[]> {
@@ -1530,4 +1579,8 @@ function ingestionRunToPrismaCreate(run: IngestionRun) {
 
 function isPrismaNotFound(error: unknown): boolean {
   return typeof error === "object" && error !== null && "code" in error && error.code === "P2025";
+}
+
+function isPrismaUniqueConstraint(error: unknown): boolean {
+  return typeof error === "object" && error !== null && "code" in error && error.code === "P2002";
 }

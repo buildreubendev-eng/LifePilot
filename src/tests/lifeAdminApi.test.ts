@@ -5,6 +5,7 @@ import { GET as getAudit } from "@/app/api/life-admin/audit/route";
 import { GET as getDocuments } from "@/app/api/life-admin/documents/route";
 import { GET as getIntegrations } from "@/app/api/life-admin/integrations/route";
 import { PATCH as patchIntegration } from "@/app/api/life-admin/integrations/[provider]/route";
+import { POST as syncIntegration } from "@/app/api/life-admin/integrations/[provider]/sync/route";
 import { GET as getHealth } from "@/app/api/life-admin/health/route";
 import { POST as postIngest } from "@/app/api/life-admin/ingest/route";
 import { GET as getIngestRuns } from "@/app/api/life-admin/ingest/runs/route";
@@ -138,6 +139,34 @@ describe("life-admin API routes", () => {
 
     expect(updateResponse.status).toBe(200);
     expect(integrationsBody.integrations.find((integration) => integration.provider === "gmail")?.status).toBe("paused");
+  });
+
+  it("runs idempotent mock provider syncs", async () => {
+    const firstResponse = await syncIntegration(
+      new Request("http://localhost/api/life-admin/integrations/gmail/sync", { method: "POST" }),
+      { params: Promise.resolve({ provider: "gmail" }) },
+    );
+    const firstBody = (await firstResponse.json()) as {
+      integration: { status: string; lastSyncAt?: string };
+      createdCount: number;
+      duplicateCount: number;
+    };
+    const secondResponse = await syncIntegration(
+      new Request("http://localhost/api/life-admin/integrations/gmail/sync", { method: "POST" }),
+      { params: Promise.resolve({ provider: "gmail" }) },
+    );
+    const secondBody = (await secondResponse.json()) as { createdCount: number; duplicateCount: number };
+    const runsResponse = await getIngestRuns();
+    const runsBody = (await runsResponse.json()) as { runs: Array<{ createdItemIds: string[] }> };
+
+    expect(firstResponse.status).toBe(200);
+    expect(firstBody.integration.status).toBe("connected");
+    expect(firstBody.integration.lastSyncAt).toBeTruthy();
+    expect(firstBody.createdCount).toBeGreaterThan(0);
+    expect(secondResponse.status).toBe(200);
+    expect(secondBody.createdCount).toBe(0);
+    expect(secondBody.duplicateCount).toBeGreaterThan(0);
+    expect(runsBody.runs).toHaveLength(2);
   });
 
   it("returns audit events", async () => {

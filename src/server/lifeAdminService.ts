@@ -1,4 +1,5 @@
 import { calculateLifeAdminScore, createWeeklyBriefing, daysUntil, generateTasks, scoreLifeAdminItem } from "@/lib/prioritization";
+import { getMockProviderSyncMessages } from "@/data/mockProviderSync";
 import type {
   AuditEvent,
   ApprovalActionType,
@@ -84,6 +85,14 @@ export interface IngestRawMessagesInput {
   provider: RawLifeAdminMessage["provider"];
   messages: Array<Omit<RawLifeAdminMessage, "id" | "provider"> & { id?: string }>;
   notes?: string;
+}
+
+export interface SyncIntegrationResult {
+  integration: IntegrationConnection;
+  run: IngestionRun;
+  items: LifeAdminMessage[];
+  createdCount: number;
+  duplicateCount: number;
 }
 
 export class LifeAdminService {
@@ -299,7 +308,11 @@ export class LifeAdminService {
 
   async ingestRawMessages(input: IngestRawMessagesInput): Promise<{ run: IngestionRun; items: LifeAdminMessage[] }> {
     const startedAt = new Date().toISOString();
-    const createdItems: LifeAdminMessage[] = [];
+    const items: LifeAdminMessage[] = [];
+    const createdItemIds: string[] = [];
+    const rawMessages = await this.repository.listRawMessages();
+    const rawById = new Map(rawMessages.map((message) => [message.id, message]));
+    const rawByDedupeKey = new Map(rawMessages.map((message) => [rawMessageDedupeKey(message), message]));
 
     for (const incoming of input.messages) {
       const raw: RawLifeAdminMessage = {
@@ -307,9 +320,33 @@ export class LifeAdminService {
         id: incoming.id ?? createId("raw"),
         provider: input.provider,
       };
+      const existingRaw = rawByDedupeKey.get(rawMessageDedupeKey(raw)) ?? rawById.get(raw.id);
+
+      if (existingRaw) {
+        const existingItem = await this.repository.getMessage(`msg-${existingRaw.id}`);
+
+        if (existingItem) {
+          items.push(existingItem);
+        }
+
+        continue;
+      }
+
+      const parsed = parseRawLifeAdminMessage(raw);
+      const existingItem = await this.repository.getMessage(parsed.id);
+
       await this.repository.createRawMessage(raw);
-      const item = await this.repository.createMessage(parseRawLifeAdminMessage(raw));
-      createdItems.push(item);
+      rawById.set(raw.id, raw);
+      rawByDedupeKey.set(rawMessageDedupeKey(raw), raw);
+
+      if (existingItem) {
+        items.push(existingItem);
+        continue;
+      }
+
+      const item = await this.repository.createMessage(parsed);
+      items.push(item);
+      createdItemIds.push(item.id);
     }
 
     const completedAt = new Date().toISOString();
@@ -320,13 +357,14 @@ export class LifeAdminService {
       startedAt,
       completedAt,
       inputCount: input.messages.length,
-      createdItemIds: createdItems.map((item) => item.id),
+      createdItemIds,
       notes: input.notes,
     });
-    await this.audit("integration_updated", "integration", input.provider, `Ingested ${createdItems.length} raw message(s) from ${input.provider}.`, {
+    await this.audit("integration_updated", "integration", input.provider, `Ingested ${createdItemIds.length} new item(s) from ${input.provider}.`, {
       inputCount: input.messages.length,
+      createdCount: createdItemIds.length,
     });
-    return { run, items: createdItems };
+    return { run, items };
   }
 
   async listIngestionRuns(): Promise<IngestionRun[]> {
@@ -434,6 +472,40 @@ export class LifeAdminService {
     }
 
     return integration;
+  }
+
+  async syncIntegration(provider: IntegrationProvider): Promise<SyncIntegrationResult | null> {
+    const current = (await this.repository.listIntegrations()).find((integration) => integration.provider === provider);
+
+    if (!current) {
+      return null;
+    }
+
+    const messages = getMockProviderSyncMessages(provider);
+    const result = await this.ingestRawMessages({
+      provider,
+      messages,
+      notes: `Mock ${current.label} sync. Future real connector will replace this payload after permissioned OAuth setup.`,
+    });
+    const now = new Date().toISOString();
+    const integration = await this.updateIntegration(provider, {
+      status: "connected",
+      connectedAt: current.connectedAt ?? now,
+      lastSyncAt: now,
+      notes: `Last mock sync created ${result.run.createdItemIds.length} new item(s) from ${messages.length} provider signal(s).`,
+    });
+
+    if (!integration) {
+      return null;
+    }
+
+    return {
+      integration,
+      run: result.run,
+      items: result.items,
+      createdCount: result.run.createdItemIds.length,
+      duplicateCount: messages.length - result.run.createdItemIds.length,
+    };
   }
 
   async listAuditEvents(limit?: number): Promise<AuditEvent[]> {
@@ -566,6 +638,10 @@ export function isLifeAdminAction(value: unknown): value is LifeAdminAction {
 
 function createId(prefix: string): string {
   return `${prefix}-${crypto.randomUUID()}`;
+}
+
+function rawMessageDedupeKey(message: RawLifeAdminMessage): string {
+  return message.externalId ? `${message.provider}:external:${message.externalId}` : `${message.provider}:raw:${message.id}`;
 }
 
 function defaultRiskLevel(actionType: ApprovalActionType): ApprovalRequest["riskLevel"] {

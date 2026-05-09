@@ -16,7 +16,7 @@ This roadmap is for API behavior, persistence, integration boundaries, data safe
 - Done: pending approval creation is idempotent for repeated sensitive-action requests.
 - Done: recommendation acceptance returns existing durable artifacts when they already exist.
 - Done: tests cover duplicate item actions, duplicate recommendation acceptance, and audit behavior.
-- Next: add repository-level uniqueness constraints before moving to a shared production database.
+- Done: repository-level uniqueness constraints protect source-backed tasks, documents, pending approvals, and provider external IDs.
 
 ## Phase 2: Durable Production Persistence
 
@@ -37,9 +37,9 @@ This roadmap is for API behavior, persistence, integration boundaries, data safe
 
 ## Phase 4: Integration Simulation Layer
 
-- Add fake connector sync jobs that use current mock providers but behave like real syncs.
+- Done: raw-message ingestion is idempotent by provider external ID, with raw ID fallback for MVP payloads.
+- Done: fake connector sync endpoint uses current mock providers but behaves like a real permissioned sync.
 - Track sync runs, provider cursors, duplicate external IDs, and partial failures.
-- Add idempotent raw-message ingestion by provider plus external ID.
 - Add API contracts for future OAuth connectors without connecting real accounts yet.
 
 ## Phase 5: Real Connector Readiness
