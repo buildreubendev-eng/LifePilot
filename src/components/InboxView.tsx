@@ -121,7 +121,7 @@ export function InboxView() {
       </section>
       {error ? <div className="mb-4 rounded-md bg-red-100 px-3 py-2 text-sm font-semibold text-red-800">{error}</div> : null}
       {notice ? <div className="mb-4 rounded-md bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-800">{notice}</div> : null}
-      <div className="mb-4 grid gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+      <div className="mb-4 grid gap-4 rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
         <label className="grid gap-1.5">
           <span className="text-xs font-bold uppercase tracking-widest text-stone-400">Search inbox</span>
           <input
@@ -132,32 +132,38 @@ export function InboxView() {
             className="rounded-lg border border-stone-200 bg-stone-50 px-3 py-2.5 text-sm outline-none transition placeholder:text-stone-400 focus:border-emerald-400 focus:bg-white focus:ring-2 focus:ring-emerald-100"
           />
         </label>
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <CategoryFilter value={category} onChange={setCategory} />
-          <div className="flex flex-wrap gap-2">
-            {statusOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setStatus(option.value)}
-                className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${
-                  status === option.value
-                    ? "bg-stone-900 text-white"
-                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-            {(category !== "all" || status !== "all" || query) && (
-              <button
-                type="button"
-                onClick={handleClearFilters}
-                className="rounded-full px-3 py-1.5 text-xs font-bold text-stone-500 ring-1 ring-stone-200 transition hover:bg-stone-50"
-              >
-                Clear
-              </button>
-            )}
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-stone-400">Category</span>
+            <CategoryFilter value={category} onChange={setCategory} compact />
+          </div>
+          <div className="grid gap-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-stone-400">Status</span>
+            <div className="flex flex-wrap gap-2">
+              {statusOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setStatus(option.value)}
+                  className={`rounded-md px-2.5 py-1.5 text-xs font-bold transition ${
+                    status === option.value
+                      ? "bg-stone-900 text-white"
+                      : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+              {(category !== "all" || status !== "all" || query) && (
+                <button
+                  type="button"
+                  onClick={handleClearFilters}
+                  className="rounded-md px-2.5 py-1.5 text-xs font-bold text-stone-500 ring-1 ring-stone-200 transition hover:bg-stone-50"
+                >
+                  Clear filters
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
