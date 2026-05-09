@@ -457,6 +457,12 @@ export class JsonFileLifeAdminRepository implements LifeAdminRepository {
 
   private async writeStore(store: PlosDataStore): Promise<void> {
     await mkdir(dirname(this.filePath), { recursive: true });
+
+    if (isEphemeralJsonStore(this.filePath)) {
+      await writeFile(this.filePath, `${JSON.stringify(normalizeStore(store), null, 2)}\n`, "utf8");
+      return;
+    }
+
     const tempPath = `${this.filePath}.tmp`;
     await writeFile(tempPath, `${JSON.stringify(normalizeStore(store), null, 2)}\n`, "utf8");
     await rename(tempPath, this.filePath);
@@ -473,6 +479,10 @@ export function getJsonStorePath(): string {
   }
 
   return join(cwd(), ".data", "plos-store.json");
+}
+
+function isEphemeralJsonStore(filePath: string): boolean {
+  return env.VERCEL === "1" && filePath === getJsonStorePath();
 }
 
 const globalForPrisma = globalThis as unknown as { plosPrisma?: PrismaClient };

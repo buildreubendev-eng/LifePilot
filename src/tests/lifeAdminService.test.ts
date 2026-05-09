@@ -117,6 +117,37 @@ describe("LifeAdminService", () => {
     }
   });
 
+  it("initializes the Vercel JSON store safely under parallel first reads", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "plos-vercel-store-"));
+    const originalVercel = process.env.VERCEL;
+    const originalDataFile = process.env.PLOS_DATA_FILE;
+
+    try {
+      process.env.VERCEL = "1";
+      process.env.PLOS_DATA_FILE = join(directory, "store.json");
+
+      const repositories = Array.from({ length: 6 }, () => new JsonFileLifeAdminRepository(getJsonStorePath()));
+      const results = await Promise.all(repositories.map((repository) => repository.listMessages()));
+
+      expect(results).toHaveLength(6);
+      expect(results.every((messages) => messages.length >= 20)).toBe(true);
+    } finally {
+      if (originalVercel === undefined) {
+        delete process.env.VERCEL;
+      } else {
+        process.env.VERCEL = originalVercel;
+      }
+
+      if (originalDataFile === undefined) {
+        delete process.env.PLOS_DATA_FILE;
+      } else {
+        process.env.PLOS_DATA_FILE = originalDataFile;
+      }
+
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
   it("creates and reviews approval requests with audit history", async () => {
     const service = new LifeAdminService(new MockLifeAdminRepository());
     const approval = await service.createApproval({
