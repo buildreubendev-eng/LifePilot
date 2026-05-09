@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { cwd } from "node:process";
+import { cwd, env } from "node:process";
+import { tmpdir } from "node:os";
 import { PrismaClient } from "@prisma/client";
 import { mockMessages } from "@/data/mockMessages";
 import type {
@@ -243,7 +244,7 @@ export class MockLifeAdminRepository implements LifeAdminRepository {
 }
 
 export class JsonFileLifeAdminRepository implements LifeAdminRepository {
-  constructor(private readonly filePath = join(cwd(), ".data", "plos-store.json")) {}
+  constructor(private readonly filePath = getJsonStorePath()) {}
 
   async listMessages(filters: MessageFilters = {}): Promise<LifeAdminMessage[]> {
     const store = await this.readStore();
@@ -460,6 +461,18 @@ export class JsonFileLifeAdminRepository implements LifeAdminRepository {
     await writeFile(tempPath, `${JSON.stringify(normalizeStore(store), null, 2)}\n`, "utf8");
     await rename(tempPath, this.filePath);
   }
+}
+
+export function getJsonStorePath(): string {
+  if (env.PLOS_DATA_FILE) {
+    return env.PLOS_DATA_FILE;
+  }
+
+  if (env.VERCEL) {
+    return join(tmpdir(), "plos-store.json");
+  }
+
+  return join(cwd(), ".data", "plos-store.json");
 }
 
 const globalForPrisma = globalThis as unknown as { plosPrisma?: PrismaClient };

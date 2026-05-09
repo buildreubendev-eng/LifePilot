@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { LifeAdminService } from "@/server/lifeAdminService";
-import { JsonFileLifeAdminRepository, MockLifeAdminRepository } from "@/server/lifeAdminRepository";
+import { getJsonStorePath, JsonFileLifeAdminRepository, MockLifeAdminRepository } from "@/server/lifeAdminRepository";
 import { mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -89,6 +89,31 @@ describe("LifeAdminService", () => {
       expect(item?.status).toBe("completed");
     } finally {
       await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("uses writable temp storage for JSON demo mode on Vercel", async () => {
+    const originalVercel = process.env.VERCEL;
+    const originalDataFile = process.env.PLOS_DATA_FILE;
+
+    try {
+      process.env.VERCEL = "1";
+      delete process.env.PLOS_DATA_FILE;
+
+      expect(getJsonStorePath()).toContain("plos-store.json");
+      expect(getJsonStorePath()).not.toContain(".data");
+    } finally {
+      if (originalVercel === undefined) {
+        delete process.env.VERCEL;
+      } else {
+        process.env.VERCEL = originalVercel;
+      }
+
+      if (originalDataFile === undefined) {
+        delete process.env.PLOS_DATA_FILE;
+      } else {
+        process.env.PLOS_DATA_FILE = originalDataFile;
+      }
     }
   });
 
