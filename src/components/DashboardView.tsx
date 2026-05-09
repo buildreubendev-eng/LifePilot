@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ItemCard } from "@/components/ItemCard";
 import { MetricCard } from "@/components/MetricCard";
@@ -20,16 +20,42 @@ function getGreeting(): string {
 }
 
 export function DashboardView() {
-  const { items, isLoading: itemsLoading } = usePlosStore();
+  const { items, isLoading: itemsLoading, isRefreshing, refreshItems, resetStatuses } = usePlosStore();
   const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
   const [recommendationCount, setRecommendationCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDashboardRefreshing, setIsDashboardRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const loadDashboard = useCallback(async (showRefreshing = true) => {
+    if (showRefreshing) {
+      setIsDashboardRefreshing(true);
+    }
+
+    try {
+      const [dashboardBody, recsBody] = await Promise.all([
+        fetchJson<{ dashboard: DashboardSummary }>("/api/life-admin/dashboard"),
+        fetchJson<{ recommendations: ActionRecommendation[] }>("/api/life-admin/recommendations"),
+      ]);
+
+      setDashboard(dashboardBody.dashboard);
+      setRecommendationCount(recsBody.recommendations.length);
+      setError(null);
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "Unable to load dashboard");
+    } finally {
+      setIsLoading(false);
+      if (showRefreshing) {
+        setIsDashboardRefreshing(false);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     let active = true;
 
-    async function loadDashboard() {
+    async function loadInitialDashboard() {
       try {
         const [dashboardBody, recsBody] = await Promise.all([
           fetchJson<{ dashboard: DashboardSummary }>("/api/life-admin/dashboard"),
@@ -52,11 +78,25 @@ export function DashboardView() {
       }
     }
 
-    void loadDashboard();
+    void loadInitialDashboard();
+
     return () => {
       active = false;
     };
   }, []);
+
+  async function refreshDashboard() {
+    await Promise.all([loadDashboard(), refreshItems()]);
+    setNotice("Dashboard refreshed.");
+    window.setTimeout(() => setNotice(null), 3000);
+  }
+
+  async function resetDemoData() {
+    const ok = await resetStatuses();
+    await Promise.all([loadDashboard(), refreshItems()]);
+    setNotice(ok ? "Demo data reset." : "Reset attempted. Check the error message above.");
+    window.setTimeout(() => setNotice(null), 3500);
+  }
 
   const score = dashboard?.lifeAdminScore ?? 0;
   const tasks = dashboard?.priorityTasks ?? [];
@@ -86,13 +126,36 @@ export function DashboardView() {
       {error ? (
         <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm font-semibold text-red-800">{error}</div>
       ) : null}
+      {notice ? (
+        <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">{notice}</div>
+      ) : null}
 
       {/* Hero: Greeting + Score */}
       <section className="grid gap-6 py-4 lg:grid-cols-[1.4fr_0.6fr] lg:items-stretch">
         <div className="rounded-2xl bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 p-8 text-white shadow-lg">
-          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-300">
-            Personal command center
-          </p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <p className="text-sm font-semibold uppercase tracking-wide text-emerald-300">
+              Personal command center
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => void refreshDashboard()}
+                disabled={isDashboardRefreshing || isRefreshing}
+                className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-white transition hover:bg-white/20 disabled:opacity-50"
+              >
+                {isDashboardRefreshing || isRefreshing ? "Refreshing..." : "Refresh"}
+              </button>
+              <button
+                type="button"
+                onClick={() => void resetDemoData()}
+                disabled={isDashboardRefreshing || isRefreshing}
+                className="rounded-lg bg-white px-3 py-2 text-xs font-bold text-stone-900 transition hover:bg-emerald-50 disabled:opacity-50"
+              >
+                Reset Demo
+              </button>
+            </div>
+          </div>
           <h1 className="mt-3 max-w-3xl text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
             {getGreeting()}, Reuben.
           </h1>

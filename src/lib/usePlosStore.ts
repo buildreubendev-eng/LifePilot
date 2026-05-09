@@ -13,12 +13,34 @@ interface ItemActionResult {
 export function usePlosStore() {
   const [items, setItems] = useState<LifeAdminMessage[]>(mockMessages);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const refreshItems = useCallback(async () => {
+    setIsRefreshing(true);
+
+    try {
+      const response = await fetch("/api/life-admin/items");
+
+      if (!response.ok) {
+        throw new Error("Unable to load PLOS items");
+      }
+
+      const body = (await response.json()) as { items: LifeAdminMessage[] };
+      setItems(body.items);
+      setError(null);
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "Unable to load PLOS items");
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  }, []);
 
   useEffect(() => {
     let active = true;
 
-    async function loadItems() {
+    async function loadInitialItems() {
       try {
         const response = await fetch("/api/life-admin/items");
 
@@ -43,12 +65,13 @@ export function usePlosStore() {
       }
     }
 
-    void loadItems();
+    void loadInitialItems();
 
     return () => {
       active = false;
     };
   }, []);
+
 
   const setItemStatus = useCallback(async (itemId: string, status: LifeAdminStatus) => {
     const previousItems = items;
@@ -113,15 +136,19 @@ export function usePlosStore() {
       const body = (await response.json()) as { items: LifeAdminMessage[] };
       setItems(body.items);
       setError(null);
+      return true;
     } catch (resetError) {
       setError(resetError instanceof Error ? resetError.message : "Unable to reset statuses");
+      return false;
     }
   }, []);
 
   return {
     items,
     isLoading,
+    isRefreshing,
     error,
+    refreshItems,
     setItemStatus,
     performItemAction,
     resetStatuses,

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { BackendStatusPill } from "@/components/BackendStatusPill";
 
 const navigation = [
   {
@@ -210,7 +211,8 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="border-t border-stone-100 px-4 py-3">
-          <div className="rounded-lg bg-emerald-50 px-3 py-2.5 text-center">
+          <BackendStatusPill />
+          <div className="mt-2 rounded-lg bg-emerald-50 px-3 py-2.5 text-center">
             <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-700">
               Mock data only
             </p>

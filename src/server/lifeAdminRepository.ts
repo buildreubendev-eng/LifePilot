@@ -465,7 +465,17 @@ export class JsonFileLifeAdminRepository implements LifeAdminRepository {
 
     const tempPath = `${this.filePath}.tmp`;
     await writeFile(tempPath, `${JSON.stringify(normalizeStore(store), null, 2)}\n`, "utf8");
-    await rename(tempPath, this.filePath);
+
+    try {
+      await rename(tempPath, this.filePath);
+    } catch (error) {
+      if (error instanceof Error && "code" in error && error.code === "ENOENT") {
+        await writeFile(this.filePath, `${JSON.stringify(normalizeStore(store), null, 2)}\n`, "utf8");
+        return;
+      }
+
+      throw error;
+    }
   }
 }
 
