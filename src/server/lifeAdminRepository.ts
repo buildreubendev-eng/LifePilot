@@ -1089,7 +1089,15 @@ function cloneIngestionRuns(runs: IngestionRun[]): IngestionRun[] {
 }
 
 function cloneIngestionRun(run: IngestionRun | null): IngestionRun | null {
-  return run ? { ...run, createdItemIds: [...run.createdItemIds] } : null;
+  return run
+    ? {
+        ...run,
+        createdItemIds: [...run.createdItemIds],
+        duplicateCount: run.duplicateCount ?? 0,
+        failedCount: run.failedCount ?? 0,
+        errorMessages: [...(run.errorMessages ?? [])],
+      }
+    : null;
 }
 
 function toDate(value?: string | null): Date | null {
@@ -1381,6 +1389,7 @@ function prismaIntegrationToIntegrationConnection(integration: {
   status: string;
   permissionScopesJson: string;
   lastSyncAt: Date | null;
+  lastSyncCursor: string | null;
   connectedAt: Date | null;
   notes: string;
 }): IntegrationConnection {
@@ -1390,6 +1399,7 @@ function prismaIntegrationToIntegrationConnection(integration: {
     status: integration.status as IntegrationConnection["status"],
     permissionScopes: parseJsonArray(integration.permissionScopesJson),
     lastSyncAt: toIso(integration.lastSyncAt),
+    lastSyncCursor: integration.lastSyncCursor ?? undefined,
     connectedAt: toIso(integration.connectedAt),
     notes: integration.notes,
   };
@@ -1402,6 +1412,7 @@ function integrationToPrismaCreate(integration: IntegrationConnection) {
     status: integration.status,
     permissionScopesJson: stringifyJson(integration.permissionScopes),
     lastSyncAt: toDate(integration.lastSyncAt),
+    lastSyncCursor: integration.lastSyncCursor ?? null,
     connectedAt: toDate(integration.connectedAt),
     notes: integration.notes,
   };
@@ -1413,6 +1424,7 @@ function integrationPatchToPrisma(patch: Partial<IntegrationConnection>) {
     ...(patch.status !== undefined ? { status: patch.status } : {}),
     ...(patch.permissionScopes !== undefined ? { permissionScopesJson: stringifyJson(patch.permissionScopes) } : {}),
     ...(patch.lastSyncAt !== undefined ? { lastSyncAt: toDate(patch.lastSyncAt) } : {}),
+    ...(patch.lastSyncCursor !== undefined ? { lastSyncCursor: patch.lastSyncCursor ?? null } : {}),
     ...(patch.connectedAt !== undefined ? { connectedAt: toDate(patch.connectedAt) } : {}),
     ...(patch.notes !== undefined ? { notes: patch.notes } : {}),
   };
@@ -1550,6 +1562,10 @@ function prismaIngestionRunToIngestionRun(run: {
   completedAt: Date;
   inputCount: number;
   createdItemIdsJson: string;
+  duplicateCount: number;
+  failedCount: number;
+  errorMessagesJson: string;
+  cursor: string | null;
   notes: string | null;
 }): IngestionRun {
   return {
@@ -1560,6 +1576,10 @@ function prismaIngestionRunToIngestionRun(run: {
     completedAt: run.completedAt.toISOString(),
     inputCount: run.inputCount,
     createdItemIds: parseJsonArray(run.createdItemIdsJson),
+    duplicateCount: run.duplicateCount,
+    failedCount: run.failedCount,
+    errorMessages: parseJsonArray(run.errorMessagesJson),
+    cursor: run.cursor ?? undefined,
     notes: run.notes ?? undefined,
   };
 }
@@ -1573,6 +1593,10 @@ function ingestionRunToPrismaCreate(run: IngestionRun) {
     completedAt: new Date(run.completedAt),
     inputCount: run.inputCount,
     createdItemIdsJson: stringifyJson(run.createdItemIds),
+    duplicateCount: run.duplicateCount,
+    failedCount: run.failedCount,
+    errorMessagesJson: stringifyJson(run.errorMessages),
+    cursor: run.cursor ?? null,
     notes: run.notes ?? null,
   };
 }

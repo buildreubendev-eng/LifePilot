@@ -39,7 +39,7 @@ This roadmap is for API behavior, persistence, integration boundaries, data safe
 
 - Done: raw-message ingestion is idempotent by provider external ID, with raw ID fallback for MVP payloads.
 - Done: fake connector sync endpoint uses current mock providers but behaves like a real permissioned sync.
-- Track sync runs, provider cursors, duplicate external IDs, and partial failures.
+- Done: sync and ingestion runs track provider cursors, duplicate counts, failed counts, and partial failures.
 - Add API contracts for future OAuth connectors without connecting real accounts yet.
 
 ## Phase 5: Real Connector Readiness

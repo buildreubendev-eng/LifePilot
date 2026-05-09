@@ -147,9 +147,10 @@ describe("life-admin API routes", () => {
       { params: Promise.resolve({ provider: "gmail" }) },
     );
     const firstBody = (await firstResponse.json()) as {
-      integration: { status: string; lastSyncAt?: string };
+      integration: { status: string; lastSyncAt?: string; lastSyncCursor?: string };
       createdCount: number;
       duplicateCount: number;
+      run: { status: string; cursor?: string };
     };
     const secondResponse = await syncIntegration(
       new Request("http://localhost/api/life-admin/integrations/gmail/sync", { method: "POST" }),
@@ -162,6 +163,8 @@ describe("life-admin API routes", () => {
     expect(firstResponse.status).toBe(200);
     expect(firstBody.integration.status).toBe("connected");
     expect(firstBody.integration.lastSyncAt).toBeTruthy();
+    expect(firstBody.integration.lastSyncCursor).toBe(firstBody.run.cursor);
+    expect(firstBody.run.status).toBe("completed");
     expect(firstBody.createdCount).toBeGreaterThan(0);
     expect(secondResponse.status).toBe(200);
     expect(secondBody.createdCount).toBe(0);
@@ -236,11 +239,13 @@ describe("life-admin API routes", () => {
     );
     const ingestBody = (await ingestResponse.json()) as { items: Array<{ id: string; category: string }> };
     const runsResponse = await getIngestRuns();
-    const runsBody = (await runsResponse.json()) as { runs: Array<{ createdItemIds: string[] }> };
+    const runsBody = (await runsResponse.json()) as { runs: Array<{ createdItemIds: string[]; duplicateCount: number; failedCount: number }> };
 
     expect(ingestResponse.status).toBe(200);
     expect(ingestBody.items[0]).toMatchObject({ id: "msg-raw-tax-form", category: "tax/document" });
     expect(runsBody.runs[0]?.createdItemIds).toContain("msg-raw-tax-form");
+    expect(runsBody.runs[0]?.duplicateCount).toBe(0);
+    expect(runsBody.runs[0]?.failedCount).toBe(0);
   });
 
   it("returns recommendations and accepts them", async () => {

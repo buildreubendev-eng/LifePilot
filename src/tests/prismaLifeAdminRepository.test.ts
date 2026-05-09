@@ -208,6 +208,9 @@ describe("PrismaLifeAdminRepository", () => {
     expect(first.run.createdItemIds).toEqual(["msg-raw-prisma-retry-first"]);
     expect(second.items[0]?.id).toBe("msg-raw-prisma-retry-first");
     expect(second.run.createdItemIds).toHaveLength(0);
+    expect(second.run.duplicateCount).toBe(1);
+    expect(second.run.failedCount).toBe(0);
+    expect(second.run.cursor).toContain("gmail:");
     expect(rawMessages.filter((message) => message.externalId === "gmail-prisma-retry-001")).toHaveLength(1);
     expect(runs).toHaveLength(2);
   });

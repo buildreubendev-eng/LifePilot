@@ -236,6 +236,10 @@ describe("LifeAdminService", () => {
     expect(result.items[0]?.category).toBe("renewal");
     expect(item?.financialImpact).toBe(19.99);
     expect(runs[0]?.createdItemIds).toContain("msg-raw-cloudnest");
+    expect(runs[0]?.status).toBe("completed");
+    expect(runs[0]?.duplicateCount).toBe(0);
+    expect(runs[0]?.failedCount).toBe(0);
+    expect(runs[0]?.cursor).toContain("gmail:");
   });
 
   it("deduplicates retried ingestion by provider external id", async () => {
@@ -275,6 +279,8 @@ describe("LifeAdminService", () => {
     expect(first.items[0]?.id).toBe("msg-raw-cloudnest-first");
     expect(second.items[0]?.id).toBe("msg-raw-cloudnest-first");
     expect(second.run.createdItemIds).toHaveLength(0);
+    expect(second.run.duplicateCount).toBe(1);
+    expect(second.run.failedCount).toBe(0);
     expect(rawMessages).toHaveLength(1);
     expect(runs).toHaveLength(2);
   });
@@ -308,7 +314,49 @@ describe("LifeAdminService", () => {
     expect(result.items).toHaveLength(2);
     expect(result.items.every((item) => item.id === "msg-raw-duplicate-tax")).toBe(true);
     expect(result.run.createdItemIds).toEqual(["msg-raw-duplicate-tax"]);
+    expect(result.run.duplicateCount).toBe(1);
     expect(rawMessages).toHaveLength(1);
+  });
+
+  it("records partial ingestion failures without dropping successful items", async () => {
+    class FailingCreateRepository extends MockLifeAdminRepository {
+      async createMessage(message: Parameters<MockLifeAdminRepository["createMessage"]>[0]) {
+        if (message.id === "msg-raw-fail") {
+          throw new Error("Simulated parser persistence failure");
+        }
+
+        return super.createMessage(message);
+      }
+    }
+
+    const service = new LifeAdminService(new FailingCreateRepository());
+    const result = await service.ingestRawMessages({
+      provider: "gmail",
+      messages: [
+        {
+          id: "raw-ok",
+          source: "Gmail",
+          sender: "BrightPath Brokerage",
+          subject: "Tax document available May 9",
+          body: "Your corrected 1099 tax document is available May 9.",
+          receivedAt: "2026-05-05T10:00:00-05:00",
+        },
+        {
+          id: "raw-fail",
+          source: "Gmail",
+          sender: "CloudNest",
+          subject: "Your trial ends May 8",
+          body: "Your premium plan trial ends May 8 and will renew for $19.99/month.",
+          receivedAt: "2026-05-05T10:30:00-05:00",
+        },
+      ],
+    });
+
+    expect(result.items.map((item) => item.id)).toEqual(["msg-raw-ok"]);
+    expect(result.run.status).toBe("partial");
+    expect(result.run.createdItemIds).toEqual(["msg-raw-ok"]);
+    expect(result.run.failedCount).toBe(1);
+    expect(result.run.errorMessages[0]).toContain("Simulated parser persistence failure");
   });
 
   it("generates recommendations and accepts sensitive actions as approvals", async () => {

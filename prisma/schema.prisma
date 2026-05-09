@@ -97,6 +97,7 @@ model IntegrationConnection {
   status               String
   permissionScopesJson String    @default("[]")
   lastSyncAt           DateTime?
+  lastSyncCursor       String?
   connectedAt          DateTime?
   notes                String
   createdAt            DateTime  @default(now())
@@ -165,6 +166,10 @@ model IngestionRun {
   completedAt        DateTime
   inputCount         Int
   createdItemIdsJson String   @default("[]")
+  duplicateCount     Int      @default(0)
+  failedCount        Int      @default(0)
+  errorMessagesJson  String   @default("[]")
+  cursor             String?
   notes              String?
 
   @@index([provider])

@@ -310,59 +310,80 @@ export class LifeAdminService {
     const startedAt = new Date().toISOString();
     const items: LifeAdminMessage[] = [];
     const createdItemIds: string[] = [];
+    const errorMessages: string[] = [];
+    let duplicateCount = 0;
     const rawMessages = await this.repository.listRawMessages();
     const rawById = new Map(rawMessages.map((message) => [message.id, message]));
     const rawByDedupeKey = new Map(rawMessages.map((message) => [rawMessageDedupeKey(message), message]));
 
     for (const incoming of input.messages) {
-      const raw: RawLifeAdminMessage = {
-        ...incoming,
-        id: incoming.id ?? createId("raw"),
-        provider: input.provider,
-      };
-      const existingRaw = rawByDedupeKey.get(rawMessageDedupeKey(raw)) ?? rawById.get(raw.id);
+      try {
+        const raw: RawLifeAdminMessage = {
+          ...incoming,
+          id: incoming.id ?? createId("raw"),
+          provider: input.provider,
+        };
+        const existingRaw = rawByDedupeKey.get(rawMessageDedupeKey(raw)) ?? rawById.get(raw.id);
 
-      if (existingRaw) {
-        const existingItem = await this.repository.getMessage(`msg-${existingRaw.id}`);
+        if (existingRaw) {
+          duplicateCount += 1;
+          const existingItem = await this.repository.getMessage(`msg-${existingRaw.id}`);
 
-        if (existingItem) {
-          items.push(existingItem);
+          if (existingItem) {
+            items.push(existingItem);
+            continue;
+          }
+
+          const recoveredItem = await this.repository.createMessage(parseRawLifeAdminMessage(existingRaw));
+          items.push(recoveredItem);
+          createdItemIds.push(recoveredItem.id);
+          continue;
         }
 
-        continue;
+        const parsed = parseRawLifeAdminMessage(raw);
+        const existingItem = await this.repository.getMessage(parsed.id);
+
+        await this.repository.createRawMessage(raw);
+        rawById.set(raw.id, raw);
+        rawByDedupeKey.set(rawMessageDedupeKey(raw), raw);
+
+        if (existingItem) {
+          duplicateCount += 1;
+          items.push(existingItem);
+          continue;
+        }
+
+        const item = await this.repository.createMessage(parsed);
+        items.push(item);
+        createdItemIds.push(item.id);
+      } catch (error) {
+        errorMessages.push(error instanceof Error ? error.message : "Unknown ingestion failure");
       }
-
-      const parsed = parseRawLifeAdminMessage(raw);
-      const existingItem = await this.repository.getMessage(parsed.id);
-
-      await this.repository.createRawMessage(raw);
-      rawById.set(raw.id, raw);
-      rawByDedupeKey.set(rawMessageDedupeKey(raw), raw);
-
-      if (existingItem) {
-        items.push(existingItem);
-        continue;
-      }
-
-      const item = await this.repository.createMessage(parsed);
-      items.push(item);
-      createdItemIds.push(item.id);
     }
 
     const completedAt = new Date().toISOString();
+    const failedCount = errorMessages.length;
+    const status: IngestionRun["status"] = failedCount === input.messages.length ? "failed" : failedCount > 0 ? "partial" : "completed";
+    const cursor = createIngestionCursor(input.provider, input.messages);
     const run = await this.repository.createIngestionRun({
       id: createId("ingest"),
       provider: input.provider,
-      status: "completed",
+      status,
       startedAt,
       completedAt,
       inputCount: input.messages.length,
       createdItemIds,
+      duplicateCount,
+      failedCount,
+      errorMessages,
+      cursor,
       notes: input.notes,
     });
     await this.audit("integration_updated", "integration", input.provider, `Ingested ${createdItemIds.length} new item(s) from ${input.provider}.`, {
       inputCount: input.messages.length,
       createdCount: createdItemIds.length,
+      duplicateCount,
+      failedCount,
     });
     return { run, items };
   }
@@ -492,6 +513,7 @@ export class LifeAdminService {
       status: "connected",
       connectedAt: current.connectedAt ?? now,
       lastSyncAt: now,
+      lastSyncCursor: result.run.cursor,
       notes: `Last mock sync created ${result.run.createdItemIds.length} new item(s) from ${messages.length} provider signal(s).`,
     });
 
@@ -504,7 +526,7 @@ export class LifeAdminService {
       run: result.run,
       items: result.items,
       createdCount: result.run.createdItemIds.length,
-      duplicateCount: messages.length - result.run.createdItemIds.length,
+      duplicateCount: result.run.duplicateCount,
     };
   }
 
@@ -642,6 +664,16 @@ function createId(prefix: string): string {
 
 function rawMessageDedupeKey(message: RawLifeAdminMessage): string {
   return message.externalId ? `${message.provider}:external:${message.externalId}` : `${message.provider}:raw:${message.id}`;
+}
+
+function createIngestionCursor(provider: RawLifeAdminMessage["provider"], messages: IngestRawMessagesInput["messages"]): string | undefined {
+  const newest = messages
+    .map((message) => message.receivedAt)
+    .filter(Boolean)
+    .sort()
+    .at(-1);
+
+  return newest ? `${provider}:${newest}` : undefined;
 }
 
 function defaultRiskLevel(actionType: ApprovalActionType): ApprovalRequest["riskLevel"] {

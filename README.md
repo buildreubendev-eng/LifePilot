@@ -12,6 +12,7 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - Task generation and prioritization service using due date proximity, financial impact, category importance, confidence, and overdue status.
 - Recommendation engine that turns active items into safe next moves, approval requests, saved documents, and tasks.
 - Idempotent backend actions for duplicate clicks, retried recommendation accepts, and repeated ingestion payloads.
+- Connector-ready ingestion run tracking with cursors, duplicate counts, failed counts, and partial-failure status.
 - Weekly Briefing generated from the same mock data.
 - Documents, Approvals, Integrations, Ingest, Activity, and Settings pages with no placeholder-only routes.
 - Local status changes persisted in browser localStorage.
@@ -57,7 +58,7 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - `PATCH /api/life-admin/settings`: update disabled categories, approval requirements, briefing day, or timezone.
 - `GET /api/life-admin/integrations`: list future connector states.
 - `PATCH /api/life-admin/integrations/:provider`: update future connector state for Gmail, Calendar, Plaid, or health.
-- `POST /api/life-admin/integrations/:provider/sync`: run an idempotent mock provider sync for future connector UX.
+- `POST /api/life-admin/integrations/:provider/sync`: run an idempotent mock provider sync for future connector UX, returning cursor and duplicate metadata.
 - `GET /api/life-admin/audit`: list backend audit events.
 - `GET /api/life-admin/approvals`: list approval requests for sensitive actions.
 - `POST /api/life-admin/approvals`: create an approval request for `send_message`, `make_payment`, or `cancel_subscription`.

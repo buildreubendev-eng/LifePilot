@@ -132,6 +132,7 @@ export interface IntegrationConnection {
   status: IntegrationStatus;
   permissionScopes: string[];
   lastSyncAt?: string;
+  lastSyncCursor?: string;
   connectedAt?: string;
   notes: string;
 }
@@ -201,11 +202,15 @@ export interface RawLifeAdminMessage {
 export interface IngestionRun {
   id: string;
   provider: RawMessageProvider;
-  status: "completed" | "failed";
+  status: "completed" | "partial" | "failed";
   startedAt: string;
   completedAt: string;
   inputCount: number;
   createdItemIds: string[];
+  duplicateCount: number;
+  failedCount: number;
+  errorMessages: string[];
+  cursor?: string;
   notes?: string;
 }
 

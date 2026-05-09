@@ -15,6 +15,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ pr
       status?: unknown;
       permissionScopes?: unknown;
       lastSyncAt?: unknown;
+      lastSyncCursor?: unknown;
       connectedAt?: unknown;
       notes?: unknown;
     };
@@ -30,6 +31,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ pr
 
     if (typeof body.lastSyncAt === "string") {
       patch.lastSyncAt = body.lastSyncAt;
+    }
+
+    if (typeof body.lastSyncCursor === "string") {
+      patch.lastSyncCursor = body.lastSyncCursor;
     }
 
     if (typeof body.connectedAt === "string") {

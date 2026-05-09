@@ -74,6 +74,7 @@ CREATE TABLE "IntegrationConnection" (
     "status" TEXT NOT NULL,
     "permissionScopesJson" TEXT NOT NULL DEFAULT '[]',
     "lastSyncAt" DATETIME,
+    "lastSyncCursor" TEXT,
     "connectedAt" DATETIME,
     "notes" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -129,6 +130,10 @@ CREATE TABLE "IngestionRun" (
     "completedAt" DATETIME NOT NULL,
     "inputCount" INTEGER NOT NULL,
     "createdItemIdsJson" TEXT NOT NULL DEFAULT '[]',
+    "duplicateCount" INTEGER NOT NULL DEFAULT 0,
+    "failedCount" INTEGER NOT NULL DEFAULT 0,
+    "errorMessagesJson" TEXT NOT NULL DEFAULT '[]',
+    "cursor" TEXT,
     "notes" TEXT
 );
 
