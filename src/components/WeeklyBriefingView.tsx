@@ -87,7 +87,7 @@ export function WeeklyBriefingView() {
         <Section title="Needs Attention This Week">
           <div className="grid gap-3">
             {briefing.attentionThisWeek.length === 0 ? (
-              <EmptyState title="Nothing urgent" copy="Your week looks manageable." />
+              <EmptyState title="Nothing urgent" copy="Your week looks manageable." icon="success" />
             ) : (
               briefing.attentionThisWeek.slice(0, 6).map((task) => (
                 <ItemCard key={task.id} task={task} />
@@ -98,7 +98,7 @@ export function WeeklyBriefingView() {
         <Section title="Overdue Items">
           <div className="grid gap-3">
             {briefing.overdueItems.length === 0 ? (
-              <EmptyState title="Nothing overdue" copy="No overdue items right now." />
+              <EmptyState title="Nothing overdue" copy="No overdue items right now." icon="success" />
             ) : (
               briefing.overdueItems.map((task) => <ItemCard key={task.id} task={task} />)
             )}
@@ -107,7 +107,7 @@ export function WeeklyBriefingView() {
         <Section title="Upcoming Bills">
           <div className="grid gap-3">
             {briefing.upcomingBills.length === 0 ? (
-              <EmptyState title="No upcoming bills" copy="No bills due soon." />
+              <EmptyState title="No upcoming bills" copy="No bills due soon." icon="success" />
             ) : (
               briefing.upcomingBills.slice(0, 5).map((task) => (
                 <ItemCard key={task.id} task={task} />
@@ -118,7 +118,7 @@ export function WeeklyBriefingView() {
         <Section title="Subscriptions Renewing Soon">
           <div className="grid gap-3">
             {briefing.renewingSubscriptions.length === 0 ? (
-              <EmptyState title="No renewals" copy="No subscriptions are renewing soon." />
+              <EmptyState title="No renewals" copy="No subscriptions are renewing soon." icon="success" />
             ) : (
               briefing.renewingSubscriptions.map((task) => (
                 <ItemCard key={task.id} task={task} />
@@ -130,7 +130,7 @@ export function WeeklyBriefingView() {
 
       <Section title="Schedule Conflicts">
         {briefing.scheduleConflicts.length === 0 ? (
-          <EmptyState title="Schedule clear" copy="Your schedule is clear of conflicts." />
+          <EmptyState title="Schedule clear" copy="Your schedule is clear of conflicts." icon="success" />
         ) : (
           <div className="grid gap-3 md:grid-cols-2">
             {briefing.scheduleConflicts.map((conflict) => (
@@ -142,7 +142,7 @@ export function WeeklyBriefingView() {
 
       <Section title="Documents That Should Be Saved">
         {briefing.documentsToSave.length === 0 ? (
-          <EmptyState title="All documents saved" copy="No documents need saving right now." />
+          <EmptyState title="All documents saved" copy="No documents need saving right now." icon="documents" />
         ) : (
           <div className="grid gap-3 lg:grid-cols-2">
             {briefing.documentsToSave.slice(0, 6).map((item) => (

@@ -121,7 +121,7 @@ export function ActivityView() {
 
       <Section title="Audit Log">
         {filtered.length === 0 ? (
-          <EmptyState title="No activity yet" copy={typeFilter === "all" ? "Complete an action, create an approval, or run ingestion to populate the audit log." : `No events matching "${typeFilter.replaceAll("_", " ")}".`} />
+          <EmptyState title="No activity yet" copy={typeFilter === "all" ? "Complete an action, create an approval, or run ingestion to populate the audit log." : `No events matching "${typeFilter.replaceAll("_", " ")}".`} icon={typeFilter === "all" ? "activity" : "search"} />
         ) : (
           <div className="divide-y divide-stone-200 rounded-lg border border-stone-200 bg-white shadow-sm">
             {filtered.map((event) => (

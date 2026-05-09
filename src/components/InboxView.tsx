@@ -82,9 +82,9 @@ export function InboxView() {
         }
       >
         {filtered.length === 0 ? (
-          <EmptyState title="Inbox zero!" copy="Your life admin is all caught up." />
+          <EmptyState title="Inbox zero!" copy="Your life admin is all caught up." icon="success" />
         ) : (
-          <div className="grid gap-3 lg:grid-cols-2">
+          <div className="grid gap-3 lg:grid-cols-2 stagger-children">
             {filtered.map((item) => (
               <ItemCard
                 key={item.id}

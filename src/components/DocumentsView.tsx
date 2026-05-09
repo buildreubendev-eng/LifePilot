@@ -94,6 +94,9 @@ export function DocumentsView() {
           <EmptyState
             title={savedDocuments.length === 0 ? "No documents saved yet" : "No matches"}
             copy={savedDocuments.length === 0 ? "Use Save Document from an inbox detail page to populate this list." : `No saved documents match "${search}".`}
+            icon={savedDocuments.length === 0 ? "documents" : "search"}
+            actionLabel={savedDocuments.length === 0 ? "Go to Inbox" : undefined}
+            actionHref={savedDocuments.length === 0 ? "/inbox" : undefined}
           />
         ) : (
           <div className="grid gap-3 lg:grid-cols-2">
@@ -120,7 +123,7 @@ export function DocumentsView() {
       </Section>
       <Section title="Save Queue">
         {filteredDocuments.length === 0 ? (
-          <EmptyState title="No documents found" copy={search ? `No documents match "${search}"` : "No documents need saving right now."} />
+          <EmptyState title="No documents found" copy={search ? `No documents match "${search}"` : "No documents need saving right now."} icon={search ? "search" : "documents"} />
         ) : (
           <div className="grid gap-3 lg:grid-cols-2">
             {filteredDocuments.map((item) => (

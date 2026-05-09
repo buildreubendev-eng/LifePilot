@@ -1,8 +1,31 @@
+function getConfidenceLabel(score: number): string {
+  if (score >= 0.85) return "High";
+  if (score >= 0.6) return "Medium";
+  return "Low";
+}
+
+function getConfidenceColor(score: number): string {
+  if (score >= 0.85) return "bg-emerald-500";
+  if (score >= 0.6) return "bg-amber-400";
+  return "bg-red-400";
+}
+
 export function ConfidenceIndicator({ score }: { score: number }) {
+  const percent = Math.round(score * 100);
+  const label = getConfidenceLabel(score);
+  const color = getConfidenceColor(score);
+
   return (
-    <div className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-200">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" /><path d="M20 3v4" /><path d="M22 5h-4" /><path d="M4 17v2" /><path d="M5 18H3" /></svg>
-      <span>{Math.round(score * 100)}% Match</span>
+    <div className="flex items-center gap-2">
+      <div className="h-1.5 w-12 rounded-full bg-stone-200 overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${color}`}
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+      <span className="text-[11px] font-bold text-stone-500">
+        {percent}% {label}
+      </span>
     </div>
   );
 }

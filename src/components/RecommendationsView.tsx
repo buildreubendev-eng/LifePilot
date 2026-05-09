@@ -100,7 +100,7 @@ export function RecommendationsView() {
 
       <Section title="Recommendation Queue">
         {recommendations.length === 0 ? (
-          <EmptyState title="No recommendations right now" copy="As new items arrive or statuses change, PLOS will generate safe next moves here." />
+          <EmptyState title="No recommendations right now" copy="As new items arrive or statuses change, PLOS will generate safe next moves here." icon="tasks" />
         ) : (
           <div className="grid gap-3">
             {recommendations.map((recommendation) => (

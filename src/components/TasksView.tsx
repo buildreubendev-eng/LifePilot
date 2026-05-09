@@ -132,9 +132,10 @@ export function TasksView() {
           <EmptyState
             title={statusFilter === "completed" ? "Nothing completed yet" : "All clear"}
             copy={statusFilter === "completed" ? "Complete tasks from the inbox to see them here." : "No tasks pending. Enjoy your day."}
+            icon={statusFilter === "completed" ? "tasks" : "success"}
           />
         ) : (
-          <div className="grid gap-3">
+          <div className="grid gap-3 stagger-children">
             {filtered.map((task) => (
               <ItemCard key={task.id} task={task} />
             ))}

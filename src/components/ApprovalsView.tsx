@@ -154,7 +154,7 @@ export function ApprovalsView() {
 
       <Section title="Review Queue">
         {approvals.length === 0 ? (
-          <EmptyState title="No approval requests" copy="Create a request above or wire future recommended actions into this approval queue." />
+          <EmptyState title="No approval requests" copy="Create a request above or wire future recommended actions into this approval queue." icon="approvals" />
         ) : (
           <div className="grid gap-3">
             {approvals.map((approval) => (
