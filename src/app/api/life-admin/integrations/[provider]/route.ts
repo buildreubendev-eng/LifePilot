@@ -29,15 +29,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ pr
       patch.permissionScopes = body.permissionScopes.filter((scope) => typeof scope === "string");
     }
 
-    if (typeof body.lastSyncAt === "string") {
+    if (typeof body.lastSyncAt === "string" || body.lastSyncAt === null) {
       patch.lastSyncAt = body.lastSyncAt;
     }
 
-    if (typeof body.lastSyncCursor === "string") {
+    if (typeof body.lastSyncCursor === "string" || body.lastSyncCursor === null) {
       patch.lastSyncCursor = body.lastSyncCursor;
     }
 
-    if (typeof body.connectedAt === "string") {
+    if (typeof body.connectedAt === "string" || body.connectedAt === null) {
       patch.connectedAt = body.connectedAt;
     }
 

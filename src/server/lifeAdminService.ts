@@ -95,6 +95,23 @@ export interface SyncIntegrationResult {
   duplicateCount: number;
 }
 
+export interface IntegrationAuthorizationContract {
+  provider: IntegrationProvider;
+  label: string;
+  state: string;
+  authorizationUrl: string;
+  callbackUrl: string;
+  requestedScopes: string[];
+  consentRequired: true;
+  expiresAt: string;
+  safetyNotes: string[];
+}
+
+export interface IntegrationAuthorizationResult {
+  integration: IntegrationConnection;
+  authorization: IntegrationAuthorizationContract;
+}
+
 export class LifeAdminService {
   constructor(private readonly repository: LifeAdminRepository = getLifeAdminRepository()) {}
 
@@ -495,6 +512,60 @@ export class LifeAdminService {
     return integration;
   }
 
+  async prepareIntegrationAuthorization(provider: IntegrationProvider): Promise<IntegrationAuthorizationResult | null> {
+    const integration = (await this.repository.listIntegrations()).find((candidate) => candidate.provider === provider);
+
+    if (!integration) {
+      return null;
+    }
+
+    const state = createAuthorizationState(provider);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    const callbackUrl = `/api/life-admin/integrations/${provider}/oauth/callback`;
+    const authorization: IntegrationAuthorizationContract = {
+      provider,
+      label: integration.label,
+      state,
+      authorizationUrl: `/api/life-admin/integrations/${provider}/oauth/mock-authorize?state=${encodeURIComponent(state)}`,
+      callbackUrl,
+      requestedScopes: integration.permissionScopes,
+      consentRequired: true,
+      expiresAt,
+      safetyNotes: authorizationSafetyNotes(provider),
+    };
+
+    await this.audit("integration_updated", "integration", provider, `Prepared ${integration.label} authorization contract.`, {
+      state,
+      expiresAt,
+    });
+
+    return { integration, authorization };
+  }
+
+  async disconnectIntegration(provider: IntegrationProvider): Promise<IntegrationConnection | null> {
+    const integration = (await this.repository.listIntegrations()).find((candidate) => candidate.provider === provider);
+
+    if (!integration) {
+      return null;
+    }
+
+    const disconnected = await this.updateIntegration(provider, {
+      status: "not_connected",
+      lastSyncAt: null,
+      lastSyncCursor: null,
+      connectedAt: null,
+      notes: `${integration.label} disconnected. Future OAuth tokens would be revoked here before local sync metadata is cleared.`,
+    });
+
+    if (disconnected) {
+      await this.audit("integration_updated", "integration", provider, `Disconnected ${integration.label} integration.`, {
+        status: "not_connected",
+      });
+    }
+
+    return disconnected;
+  }
+
   async syncIntegration(provider: IntegrationProvider): Promise<SyncIntegrationResult | null> {
     const current = (await this.repository.listIntegrations()).find((integration) => integration.provider === provider);
 
@@ -660,6 +731,28 @@ export function isLifeAdminAction(value: unknown): value is LifeAdminAction {
 
 function createId(prefix: string): string {
   return `${prefix}-${crypto.randomUUID()}`;
+}
+
+function createAuthorizationState(provider: IntegrationProvider): string {
+  return `${provider}-${crypto.randomUUID()}`;
+}
+
+function authorizationSafetyNotes(provider: IntegrationProvider): string[] {
+  const common = [
+    "PLOS will request explicit permission before connecting.",
+    "No sending, payment, cancellation, or health action can run without approval.",
+    "Disconnecting clears local sync metadata in this MVP contract.",
+  ];
+
+  if (provider === "plaid") {
+    return [...common, "Plaid is read-only in this roadmap until legal and privacy review is complete."];
+  }
+
+  if (provider === "health") {
+    return [...common, "Health portal access remains disabled until stricter privacy controls are added."];
+  }
+
+  return common;
 }
 
 function rawMessageDedupeKey(message: RawLifeAdminMessage): string {

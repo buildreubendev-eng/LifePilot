@@ -236,7 +236,7 @@ export function IntegrationsView() {
                             health.score >= 80 ? "bg-emerald-400 animate-pulse" : health.score >= 50 ? "bg-amber-400" : "bg-red-400"
                           }`} />
                         )}
-                        <p className="text-sm font-semibold text-stone-700">{formatSyncAge(integration.lastSyncAt, now)}</p>
+                        <p className="text-sm font-semibold text-stone-700">{formatSyncAge(integration.lastSyncAt ?? undefined, now)}</p>
                       </div>
                     </div>
                     <div className="h-8 w-px bg-stone-200" />

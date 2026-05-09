@@ -131,9 +131,9 @@ export interface IntegrationConnection {
   label: string;
   status: IntegrationStatus;
   permissionScopes: string[];
-  lastSyncAt?: string;
-  lastSyncCursor?: string;
-  connectedAt?: string;
+  lastSyncAt?: string | null;
+  lastSyncCursor?: string | null;
+  connectedAt?: string | null;
   notes: string;
 }
 

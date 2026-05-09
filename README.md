@@ -58,7 +58,9 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - `PATCH /api/life-admin/settings`: update disabled categories, approval requirements, briefing day, or timezone.
 - `GET /api/life-admin/integrations`: list future connector states.
 - `PATCH /api/life-admin/integrations/:provider`: update future connector state for Gmail, Calendar, Plaid, or health.
+- `POST /api/life-admin/integrations/:provider/authorize`: prepare a future OAuth authorization contract without connecting a real account.
 - `POST /api/life-admin/integrations/:provider/sync`: run an idempotent mock provider sync for future connector UX, returning cursor and duplicate metadata.
+- `POST /api/life-admin/integrations/:provider/disconnect`: disconnect a provider and clear local sync metadata.
 - `GET /api/life-admin/audit`: list backend audit events.
 - `GET /api/life-admin/approvals`: list approval requests for sensitive actions.
 - `POST /api/life-admin/approvals`: create an approval request for `send_message`, `make_payment`, or `cancel_subscription`.

@@ -210,7 +210,7 @@ export function ConnectorsPanel() {
                     <p className="mt-0.5 text-sm text-stone-500">{integration.notes}</p>
                     {integration.status === "connected" && (
                       <div className="mt-1.5 flex items-center gap-4">
-                        {renderSyncFreshness(integration.lastSyncAt)}
+                        {renderSyncFreshness(integration.lastSyncAt ?? undefined)}
                         {integration.connectedAt && (
                           <span className="text-[11px] text-stone-400">
                             Since {new Date(integration.connectedAt).toLocaleDateString("en", { month: "short", day: "numeric" })}

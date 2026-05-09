@@ -5,6 +5,8 @@ import { GET as getAudit } from "@/app/api/life-admin/audit/route";
 import { GET as getDocuments } from "@/app/api/life-admin/documents/route";
 import { GET as getIntegrations } from "@/app/api/life-admin/integrations/route";
 import { PATCH as patchIntegration } from "@/app/api/life-admin/integrations/[provider]/route";
+import { POST as authorizeIntegration } from "@/app/api/life-admin/integrations/[provider]/authorize/route";
+import { POST as disconnectIntegration } from "@/app/api/life-admin/integrations/[provider]/disconnect/route";
 import { POST as syncIntegration } from "@/app/api/life-admin/integrations/[provider]/sync/route";
 import { GET as getHealth } from "@/app/api/life-admin/health/route";
 import { POST as postIngest } from "@/app/api/life-admin/ingest/route";
@@ -170,6 +172,53 @@ describe("life-admin API routes", () => {
     expect(secondBody.createdCount).toBe(0);
     expect(secondBody.duplicateCount).toBeGreaterThan(0);
     expect(runsBody.runs).toHaveLength(2);
+  });
+
+  it("returns future OAuth authorization contracts", async () => {
+    const response = await authorizeIntegration(
+      new Request("http://localhost/api/life-admin/integrations/gmail/authorize", { method: "POST" }),
+      { params: Promise.resolve({ provider: "gmail" }) },
+    );
+    const body = (await response.json()) as {
+      authorization: {
+        provider: string;
+        state: string;
+        authorizationUrl: string;
+        callbackUrl: string;
+        requestedScopes: string[];
+        safetyNotes: string[];
+      };
+    };
+
+    expect(response.status).toBe(200);
+    expect(body.authorization.provider).toBe("gmail");
+    expect(body.authorization.state).toContain("gmail-");
+    expect(body.authorization.authorizationUrl).toContain("/oauth/mock-authorize");
+    expect(body.authorization.callbackUrl).toContain("/oauth/callback");
+    expect(body.authorization.requestedScopes.length).toBeGreaterThan(0);
+    expect(body.authorization.safetyNotes.some((note) => note.includes("approval"))).toBe(true);
+  });
+
+  it("disconnects integrations and clears sync metadata", async () => {
+    await syncIntegration(
+      new Request("http://localhost/api/life-admin/integrations/gmail/sync", { method: "POST" }),
+      { params: Promise.resolve({ provider: "gmail" }) },
+    );
+
+    const response = await disconnectIntegration(
+      new Request("http://localhost/api/life-admin/integrations/gmail/disconnect", { method: "POST" }),
+      { params: Promise.resolve({ provider: "gmail" }) },
+    );
+    const body = (await response.json()) as {
+      integration: { status: string; lastSyncAt?: string | null; lastSyncCursor?: string | null; connectedAt?: string | null; notes: string };
+    };
+
+    expect(response.status).toBe(200);
+    expect(body.integration.status).toBe("not_connected");
+    expect(body.integration.lastSyncAt).toBeNull();
+    expect(body.integration.lastSyncCursor).toBeNull();
+    expect(body.integration.connectedAt).toBeNull();
+    expect(body.integration.notes).toContain("disconnected");
   });
 
   it("returns audit events", async () => {
