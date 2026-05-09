@@ -135,4 +135,42 @@ describe("PrismaLifeAdminRepository", () => {
     expect(runs).toHaveLength(0);
     expect(ingestedItem).toBeNull();
   });
+
+  it("keeps service actions idempotent in Prisma mode", async () => {
+    const firstTask = await service.performItemAction("msg-car-insurance-renewal", {
+      action: "create_task",
+      taskTitle: "Compare auto policy renewal",
+    });
+    const secondTask = await service.performItemAction("msg-car-insurance-renewal", {
+      action: "create_task",
+      taskTitle: "Duplicate task from retry",
+    });
+    const firstDocument = await service.performItemAction("msg-tax-document", { action: "save_document" });
+    const secondDocument = await service.performItemAction("msg-tax-document", { action: "save_document" });
+    const approvalInput = {
+      actionType: "make_payment" as const,
+      title: "Approve payment review for Medical bill from Lakeside Clinic",
+      description: "Review amount, due date, and source before any payment.",
+      sourceMessageId: "msg-medical-bill",
+    };
+    const firstApproval = await service.createApproval(approvalInput);
+    const secondApproval = await service.createApproval(approvalInput);
+
+    const [tasks, documents, approvals, auditLog] = await Promise.all([
+      repository.listManualTasks(),
+      repository.listDocuments(),
+      repository.listApprovals(),
+      repository.listAuditEvents(),
+    ]);
+
+    expect(secondTask?.task?.id).toBe(firstTask?.task?.id);
+    expect(secondDocument?.document?.id).toBe(firstDocument?.document?.id);
+    expect(secondApproval.id).toBe(firstApproval.id);
+    expect(tasks.filter((task) => task.sourceMessageId === "msg-car-insurance-renewal")).toHaveLength(1);
+    expect(documents.filter((document) => document.sourceMessageId === "msg-tax-document")).toHaveLength(1);
+    expect(approvals.filter((approval) => approval.sourceMessageId === "msg-medical-bill")).toHaveLength(1);
+    expect(auditLog.filter((event) => event.type === "task_created")).toHaveLength(1);
+    expect(auditLog.filter((event) => event.type === "document_saved")).toHaveLength(1);
+    expect(auditLog.filter((event) => event.type === "approval_created")).toHaveLength(1);
+  });
 });

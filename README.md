@@ -33,6 +33,8 @@ The original working prompt called the app "LifePilot." Treat that as the old co
 - `src/lib/apiClient.ts`: small browser fetch helper for typed backend calls.
 - `gemini/START_HERE_UI_UX.md`: design-only starting brief for Gemini.
 - `UI_UX_ROADMAP.md`: broader design-only task list and roadmap.
+- `FRONTEND_ROADMAP.md`: product UI, workflow, responsive, and QOL roadmap.
+- `BACKEND_ROADMAP.md`: persistence, idempotency, integration, and production backend roadmap.
 
 ## Backend API
 

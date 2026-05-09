@@ -23,7 +23,7 @@ import type {
 } from "@/lib/types";
 import { getLifeAdminRepository, type LifeAdminRepository, type MessageFilters } from "@/server/lifeAdminRepository";
 import { parseRawLifeAdminMessage } from "@/server/rawMessageParser";
-import { generateActionRecommendations } from "@/server/recommendationEngine";
+import { generateActionRecommendations, recommendationId } from "@/server/recommendationEngine";
 
 export const lifeAdminStatuses: LifeAdminStatus[] = ["new", "reviewed", "completed", "ignored"];
 
@@ -199,6 +199,12 @@ export class LifeAdminService {
   }
 
   async createManualTask(input: CreateManualTaskInput): Promise<ManualTask> {
+    const existing = await this.findManualTaskForMessage(input.sourceMessageId);
+
+    if (existing) {
+      return existing;
+    }
+
     const now = new Date().toISOString();
     const task: ManualTask = {
       id: createId("task"),
@@ -255,7 +261,7 @@ export class LifeAdminService {
     const recommendation = recommendations.find((candidate) => candidate.id === id);
 
     if (!recommendation) {
-      return null;
+      return this.findAcceptedRecommendation(id);
     }
 
     const item = await this.repository.getMessage(recommendation.sourceMessageId);
@@ -328,6 +334,12 @@ export class LifeAdminService {
   }
 
   async createApproval(input: CreateApprovalInput): Promise<ApprovalRequest> {
+    const existing = await this.findPendingApproval(input);
+
+    if (existing) {
+      return existing;
+    }
+
     const now = new Date().toISOString();
     const approval: ApprovalRequest = {
       id: createId("approval"),
@@ -440,6 +452,12 @@ export class LifeAdminService {
   }
 
   private async saveDocumentFromMessage(item: LifeAdminMessage, notes?: string): Promise<DocumentRecord> {
+    const existing = await this.findDocumentForMessage(item.id);
+
+    if (existing) {
+      return existing;
+    }
+
     const now = new Date().toISOString();
     const document: DocumentRecord = {
       id: `doc-${item.id}`,
@@ -456,6 +474,63 @@ export class LifeAdminService {
       sourceMessageId: item.id,
     });
     return saved;
+  }
+
+  private async findDocumentForMessage(sourceMessageId: string): Promise<DocumentRecord | undefined> {
+    const documents = await this.repository.listDocuments();
+    return documents.find((document) => document.sourceMessageId === sourceMessageId);
+  }
+
+  private async findManualTaskForMessage(sourceMessageId?: string): Promise<ManualTask | undefined> {
+    if (!sourceMessageId) {
+      return undefined;
+    }
+
+    const tasks = await this.repository.listManualTasks();
+    return tasks.find((task) => task.sourceMessageId === sourceMessageId);
+  }
+
+  private async findPendingApproval(input: CreateApprovalInput): Promise<ApprovalRequest | undefined> {
+    const approvals = await this.repository.listApprovals();
+    return approvals.find(
+      (approval) =>
+        approval.status === "pending" &&
+        approval.actionType === input.actionType &&
+        (input.sourceMessageId
+          ? approval.sourceMessageId === input.sourceMessageId
+          : approval.title === input.title && approval.description === input.description),
+    );
+  }
+
+  private async findAcceptedRecommendation(id: string): Promise<RecommendationAcceptResult | null> {
+    const parsed = parseRecommendationId(id);
+
+    if (!parsed) {
+      return null;
+    }
+
+    const item = await this.repository.getMessage(parsed.sourceMessageId);
+
+    if (!item) {
+      return null;
+    }
+
+    if (parsed.actionType === "save_document") {
+      const document = await this.findDocumentForMessage(parsed.sourceMessageId);
+      return document ? { recommendation: recommendationFromDocument(item), item, document } : null;
+    }
+
+    if (parsed.actionType === "create_task") {
+      const task = await this.findManualTaskForMessage(parsed.sourceMessageId);
+      return task ? { recommendation: recommendationFromTask(item), item, task } : null;
+    }
+
+    const approvals = await this.repository.listApprovals();
+    const approval = approvals.find(
+      (candidate) => candidate.sourceMessageId === parsed.sourceMessageId && candidate.actionType === parsed.approvalActionType,
+    );
+
+    return approval ? { recommendation: recommendationFromApproval(item, approval), item, approval } : null;
   }
 
   private async audit(
@@ -499,6 +574,92 @@ function defaultRiskLevel(actionType: ApprovalActionType): ApprovalRequest["risk
   }
 
   return "medium";
+}
+
+type ParsedRecommendationId =
+  | { actionType: "save_document"; sourceMessageId: string }
+  | { actionType: "create_task"; sourceMessageId: string }
+  | { actionType: "create_approval"; approvalActionType: ApprovalActionType; sourceMessageId: string };
+
+const approvalActionTypes: ApprovalActionType[] = ["send_message", "make_payment", "cancel_subscription"];
+
+function parseRecommendationId(id: string): ParsedRecommendationId | null {
+  const saveDocumentPrefix = "rec-save_document-";
+  const createTaskPrefix = "rec-create_task-";
+
+  if (id.startsWith(saveDocumentPrefix)) {
+    return {
+      actionType: "save_document",
+      sourceMessageId: id.slice(saveDocumentPrefix.length),
+    };
+  }
+
+  if (id.startsWith(createTaskPrefix)) {
+    return {
+      actionType: "create_task",
+      sourceMessageId: id.slice(createTaskPrefix.length),
+    };
+  }
+
+  for (const approvalActionType of approvalActionTypes) {
+    const createApprovalPrefix = `rec-create_approval-${approvalActionType}-`;
+
+    if (id.startsWith(createApprovalPrefix)) {
+      return {
+        actionType: "create_approval",
+        approvalActionType,
+        sourceMessageId: id.slice(createApprovalPrefix.length),
+      };
+    }
+  }
+
+  return null;
+}
+
+function recommendationFromDocument(item: LifeAdminMessage): ActionRecommendation {
+  return {
+    id: recommendationId("save_document", item.id),
+    sourceMessageId: item.id,
+    actionType: "save_document",
+    title: `Save ${item.title}`,
+    description: "Store this item in the PLOS document queue for records, tax, travel, warranty, or medical follow-up.",
+    reason: "This document has already been saved; returning the existing record keeps repeated accepts idempotent.",
+    priority: item.priority === "urgent" ? "high" : item.priority,
+    riskLevel: "low",
+    dueDate: item.dueDate,
+    acceptLabel: "Saved",
+  };
+}
+
+function recommendationFromTask(item: LifeAdminMessage): ActionRecommendation {
+  return {
+    id: recommendationId("create_task", item.id),
+    sourceMessageId: item.id,
+    actionType: "create_task",
+    title: `Create task for ${item.title}`,
+    description: item.suggestedAction,
+    reason: "A task already exists for this item; returning it keeps repeated accepts idempotent.",
+    priority: item.priority,
+    riskLevel: "low",
+    dueDate: item.dueDate,
+    acceptLabel: "Created",
+  };
+}
+
+function recommendationFromApproval(item: LifeAdminMessage, approval: ApprovalRequest): ActionRecommendation {
+  return {
+    id: recommendationId("create_approval", item.id, approval.actionType),
+    sourceMessageId: item.id,
+    actionType: "create_approval",
+    approvalActionType: approval.actionType,
+    title: approval.title,
+    description: approval.description,
+    reason: "An approval request already exists for this sensitive action; returning it keeps repeated accepts idempotent.",
+    priority: item.priority,
+    riskLevel: approval.riskLevel,
+    dueDate: item.dueDate,
+    acceptLabel: "Created",
+  };
 }
 
 function manualTaskToLifeAdminTask(task: ManualTask, now: Date): LifeAdminTask {

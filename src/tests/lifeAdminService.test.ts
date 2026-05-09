@@ -51,6 +51,18 @@ describe("LifeAdminService", () => {
     expect(auditLog.some((event) => event.type === "document_saved")).toBe(true);
   });
 
+  it("keeps document saves idempotent", async () => {
+    const service = new LifeAdminService(new MockLifeAdminRepository());
+    const first = await service.performItemAction("msg-tax-document", { action: "save_document" });
+    const second = await service.performItemAction("msg-tax-document", { action: "save_document" });
+    const documents = await service.listDocuments();
+    const auditLog = await service.listAuditEvents();
+
+    expect(second?.document?.id).toBe(first?.document?.id);
+    expect(documents).toHaveLength(1);
+    expect(auditLog.filter((event) => event.type === "document_saved")).toHaveLength(1);
+  });
+
   it("creates manual tasks from inbox actions", async () => {
     const service = new LifeAdminService(new MockLifeAdminRepository());
     const result = await service.performItemAction("msg-car-insurance-renewal", {
@@ -62,6 +74,25 @@ describe("LifeAdminService", () => {
     expect(result?.task?.title).toBe("Compare auto policy renewal");
     expect(result?.item.taskCreatedAt).toBeTruthy();
     expect(tasks).toHaveLength(1);
+  });
+
+  it("keeps source-backed task creation idempotent", async () => {
+    const service = new LifeAdminService(new MockLifeAdminRepository());
+    const first = await service.performItemAction("msg-car-insurance-renewal", {
+      action: "create_task",
+      taskTitle: "Compare auto policy renewal",
+    });
+    const second = await service.performItemAction("msg-car-insurance-renewal", {
+      action: "create_task",
+      taskTitle: "Duplicate click should not create this",
+    });
+    const tasks = await service.listManualTasks();
+    const auditLog = await service.listAuditEvents();
+
+    expect(second?.task?.id).toBe(first?.task?.id);
+    expect(second?.task?.title).toBe("Compare auto policy renewal");
+    expect(tasks).toHaveLength(1);
+    expect(auditLog.filter((event) => event.type === "task_created")).toHaveLength(1);
   });
 
   it("hides disabled categories unless requested", async () => {
@@ -165,6 +196,24 @@ describe("LifeAdminService", () => {
     expect(auditLog.map((event) => event.type)).toEqual(expect.arrayContaining(["approval_created", "approval_reviewed"]));
   });
 
+  it("keeps pending approval creation idempotent", async () => {
+    const service = new LifeAdminService(new MockLifeAdminRepository());
+    const input = {
+      actionType: "make_payment" as const,
+      title: "Pay medical bill",
+      description: "Approve payment only after reviewing the EOB.",
+      sourceMessageId: "msg-medical-bill",
+    };
+    const first = await service.createApproval(input);
+    const second = await service.createApproval(input);
+    const approvals = await service.listApprovals();
+    const auditLog = await service.listAuditEvents();
+
+    expect(second.id).toBe(first.id);
+    expect(approvals).toHaveLength(1);
+    expect(auditLog.filter((event) => event.type === "approval_created")).toHaveLength(1);
+  });
+
   it("ingests raw messages into normalized life-admin items", async () => {
     const service = new LifeAdminService(new MockLifeAdminRepository());
     const result = await service.ingestRawMessages({
@@ -205,6 +254,25 @@ describe("LifeAdminService", () => {
     expect(approvals.some((approval) => approval.id === result?.approval?.id)).toBe(true);
   });
 
+  it("accepts the same approval recommendation idempotently", async () => {
+    const service = new LifeAdminService(new MockLifeAdminRepository());
+    const recommendations = await service.listRecommendations(now);
+    const paymentRecommendation = recommendations.find(
+      (recommendation) => recommendation.actionType === "create_approval" && recommendation.approvalActionType === "make_payment",
+    );
+
+    expect(paymentRecommendation).toBeTruthy();
+
+    const first = await service.acceptRecommendation(paymentRecommendation?.id ?? "");
+    const second = await service.acceptRecommendation(paymentRecommendation?.id ?? "");
+    const approvals = await service.listApprovals();
+    const auditLog = await service.listAuditEvents();
+
+    expect(second?.approval?.id).toBe(first?.approval?.id);
+    expect(approvals).toHaveLength(1);
+    expect(auditLog.filter((event) => event.type === "approval_created")).toHaveLength(1);
+  });
+
   it("accepts document recommendations by saving records", async () => {
     const service = new LifeAdminService(new MockLifeAdminRepository());
     const recommendations = await service.listRecommendations(now);
@@ -217,5 +285,20 @@ describe("LifeAdminService", () => {
 
     expect(result?.document?.sourceMessageId).toBe(documentRecommendation?.sourceMessageId);
     expect(documents.some((document) => document.id === result?.document?.id)).toBe(true);
+  });
+
+  it("accepts the same document recommendation idempotently", async () => {
+    const service = new LifeAdminService(new MockLifeAdminRepository());
+    const recommendations = await service.listRecommendations(now);
+    const documentRecommendation = recommendations.find((recommendation) => recommendation.actionType === "save_document");
+
+    expect(documentRecommendation).toBeTruthy();
+
+    const first = await service.acceptRecommendation(documentRecommendation?.id ?? "");
+    const second = await service.acceptRecommendation(documentRecommendation?.id ?? "");
+    const documents = await service.listDocuments();
+
+    expect(second?.document?.id).toBe(first?.document?.id);
+    expect(documents).toHaveLength(1);
   });
 });
