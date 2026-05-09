@@ -13,21 +13,15 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
+    "db:deploy": "node scripts/apply-prisma-migration.mjs",
     "db:studio": "prisma studio"
   },
   "dependencies": {
-
     "@base-ui/react": "^1.4.1",
-    "@prisma/client": "^7.8.0",
+    "@prisma/client": "^6.19.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.14.0",
-
-    "@base-ui/react": "^1.4.1",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "lucide-react": "^1.14.0",
-
     "next": "16.2.4",
     "react": "19.2.5",
     "react-dom": "19.2.5",

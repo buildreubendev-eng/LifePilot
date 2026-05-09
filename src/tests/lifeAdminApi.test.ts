@@ -5,6 +5,7 @@ import { GET as getAudit } from "@/app/api/life-admin/audit/route";
 import { GET as getDocuments } from "@/app/api/life-admin/documents/route";
 import { GET as getIntegrations } from "@/app/api/life-admin/integrations/route";
 import { PATCH as patchIntegration } from "@/app/api/life-admin/integrations/[provider]/route";
+import { GET as getHealth } from "@/app/api/life-admin/health/route";
 import { POST as postIngest } from "@/app/api/life-admin/ingest/route";
 import { GET as getIngestRuns } from "@/app/api/life-admin/ingest/runs/route";
 import { POST as postAction } from "@/app/api/life-admin/items/[id]/action/route";
@@ -31,6 +32,21 @@ describe("life-admin API routes", () => {
 
     expect(response.status).toBe(200);
     expect(body.items.length).toBeGreaterThanOrEqual(20);
+  });
+
+  it("returns backend health checks", async () => {
+    const response = await getHealth();
+    const body = (await response.json()) as {
+      ok: boolean;
+      counts: { messages: number; integrations: number };
+      checks: Array<{ name: string; ok: boolean }>;
+    };
+
+    expect(response.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.counts.messages).toBeGreaterThanOrEqual(20);
+    expect(body.counts.integrations).toBe(4);
+    expect(body.checks.every((check) => check.ok)).toBe(true);
   });
 
   it("returns a detail item by id", async () => {
