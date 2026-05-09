@@ -1,53 +1,43 @@
+import { Text } from '@mantine/core';
+
 interface MetricCardProps {
   label: string;
   value: string | number;
   detail: string;
-  trend?: "up" | "down" | "neutral";
+  trend?: "up" | "down" | "neutral" | "success" | "warning" | "danger" | "default";
   accent?: "default" | "success" | "warning" | "danger";
+  icon?: React.ReactNode;
 }
 
-const accentClasses: Record<string, string> = {
-  default: "border-stone-200",
-  success: "border-emerald-200",
-  warning: "border-amber-200",
-  danger: "border-red-200",
-};
+export function MetricCard({ label, value, detail, trend, accent = "default", icon }: MetricCardProps) {
+  const getColors = () => {
+    // Treat 'accent' or 'trend' similarly for color fallback
+    const effectiveStatus = accent !== "default" ? accent : trend;
+    switch (effectiveStatus) {
+      case 'success': return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
+      case 'warning': return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
+      case 'danger': return 'text-red-400 bg-red-500/10 border-red-500/20';
+      default: return 'text-stone-400 bg-white/5 border-white/5';
+    }
+  };
 
-const trendIcons: Record<string, React.ReactNode> = {
-  up: (
-    <span className="flex items-center gap-0.5 text-emerald-600">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="18,15 12,9 6,15" />
-      </svg>
-    </span>
-  ),
-  down: (
-    <span className="flex items-center gap-0.5 text-red-500">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="6,9 12,15 18,9" />
-      </svg>
-    </span>
-  ),
-  neutral: (
-    <span className="flex items-center gap-0.5 text-stone-400">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-    </span>
-  ),
-};
-
-export function MetricCard({ label, value, detail, trend, accent = "default" }: MetricCardProps) {
   return (
-    <div
-      className={`rounded-xl border bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${accentClasses[accent]}`}
-    >
-      <div className="flex items-center justify-between">
-        <p className="text-[11px] font-bold uppercase tracking-widest text-stone-400">{label}</p>
-        {trend && trendIcons[trend]}
+    <div className={`rounded-2xl border p-5 backdrop-blur-md transition-all hover:bg-white/10 shadow-lg ${getColors()}`}>
+      <div className="flex items-start justify-between mb-3">
+        <div className="p-2 rounded-lg bg-black/30">
+          {icon || (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 20V10" />
+              <path d="m18 20-6-10-6 10" />
+            </svg>
+          )}
+        </div>
       </div>
-      <p className="mt-3 text-3xl font-black tabular-nums text-stone-950">{value}</p>
-      <p className="mt-2 text-xs leading-5 text-stone-500">{detail}</p>
+      <div className="mt-auto">
+        <Text fz={32} fw={800} className="text-white leading-none mb-1 tabular-nums">{value}</Text>
+        <Text fz="xs" fw={600} tt="uppercase" lts={1} className="opacity-80">{label}</Text>
+        {detail && <Text fz={11} className="mt-2 text-stone-400">{detail}</Text>}
+      </div>
     </div>
   );
 }

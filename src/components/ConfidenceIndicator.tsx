@@ -17,13 +17,13 @@ export function ConfidenceIndicator({ score }: { score: number }) {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="h-1.5 w-12 rounded-full bg-stone-200 overflow-hidden">
+      <div className="h-1.5 w-12 rounded-full bg-white/10 overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-500 ${color}`}
           style={{ width: `${percent}%` }}
         />
       </div>
-      <span className="text-[11px] font-bold text-stone-500">
+      <span className="text-[11px] font-bold text-stone-400">
         {percent}% {label}
       </span>
     </div>

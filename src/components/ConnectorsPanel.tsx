@@ -154,23 +154,23 @@ export function ConnectorsPanel() {
     return (
       <div className="flex items-center gap-1.5">
         <span className={`inline-block h-2 w-2 rounded-full ${freshness.dotColor} animate-pulse`} />
-        <span className="text-[11px] font-semibold text-stone-500">{freshness.label}</span>
+        <span className="text-[11px] font-semibold text-stone-400">{freshness.label}</span>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+    <div className="rounded-xl border border-white/10 bg-black/40 p-6 shadow-sm">
       <div className="flex items-center gap-3 mb-1">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-100">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-600">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-400">
             <circle cx="12" cy="12" r="3" />
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
           </svg>
         </div>
-        <h2 className="text-lg font-bold text-stone-950">Integrations & Connectors</h2>
+        <h2 className="text-lg font-bold text-white">Integrations & Connectors</h2>
       </div>
-      <p className="mt-2 text-sm leading-6 text-stone-500">
+      <p className="mt-2 text-sm leading-6 text-stone-400">
         Link external services securely. PLOS requests read-only access by default; action permissions are requested per-action.
       </p>
 
@@ -178,7 +178,7 @@ export function ConnectorsPanel() {
 
       {isLoading ? (
         <div className="mt-4 flex items-center justify-center py-6">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-stone-200 border-t-stone-900" />
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/10 border-t-stone-900" />
         </div>
       ) : (
         <div className="mt-5 grid gap-3">
@@ -190,12 +190,12 @@ export function ConnectorsPanel() {
                   ? "border-emerald-200 bg-emerald-50/30"
                   : integration.status === "error"
                     ? "border-red-200 bg-red-50/30"
-                    : "border-stone-200 bg-white"
+                    : "border-white/10 bg-black/40"
               }`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white border border-stone-100 shadow-sm">
+                  <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-black/40 border border-white/5 shadow-sm">
                     {providerIcons[integration.provider] ?? (
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-stone-400">
                         <circle cx="12" cy="12" r="10" />
@@ -204,10 +204,10 @@ export function ConnectorsPanel() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-stone-900">{integration.label}</h3>
+                      <h3 className="font-bold text-white">{integration.label}</h3>
                       {statusBadge(integration.status)}
                     </div>
-                    <p className="mt-0.5 text-sm text-stone-500">{integration.notes}</p>
+                    <p className="mt-0.5 text-sm text-stone-400">{integration.notes}</p>
                     {integration.status === "connected" && (
                       <div className="mt-1.5 flex items-center gap-4">
                         {renderSyncFreshness(integration.lastSyncAt ?? undefined)}
@@ -225,7 +225,7 @@ export function ConnectorsPanel() {
                           className={`rounded-md px-2 py-0.5 text-[10px] font-semibold ${
                             integration.status === "connected"
                               ? "bg-emerald-100 text-emerald-700"
-                              : "bg-stone-100 text-stone-500"
+                              : "bg-white/5 text-stone-400"
                           }`}
                           title={providerScopeDescriptions[integration.provider]?.[scope] ?? scope}
                         >
@@ -240,14 +240,14 @@ export function ConnectorsPanel() {
                   {integration.status === "not_connected" || integration.status === "error" ? (
                     <button
                       onClick={() => openAuthFlow(integration)}
-                      className="rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-stone-800"
+                      className="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-stone-800"
                     >
                       {integration.status === "error" ? "Reconnect" : "Connect"}
                     </button>
                   ) : integration.status === "connected" ? (
                     <button
                       onClick={() => handleDisconnect(integration.provider)}
-                      className="rounded-lg border border-stone-200 bg-white px-4 py-2.5 text-sm font-semibold text-stone-600 transition hover:bg-stone-50"
+                      className="rounded-lg border border-white/10 bg-black/40 px-4 py-2.5 text-sm font-semibold text-stone-400 transition hover:bg-black/20"
                     >
                       Disconnect
                     </button>
@@ -271,13 +271,13 @@ export function ConnectorsPanel() {
         <Modal isOpen={!!authModal} onClose={() => { setAuthModal(null); setPermissionStep("overview"); }} title={`Connect ${authModal.label}`}>
           {permissionStep === "overview" && (
             <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-4 rounded-xl bg-stone-50 p-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-stone-100 shadow-sm">
+              <div className="flex items-center gap-4 rounded-xl bg-black/20 p-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-black/40 border border-white/5 shadow-sm">
                   {providerIcons[authModal.provider]}
                 </div>
                 <div>
-                  <h3 className="font-bold text-stone-900">{authModal.label}</h3>
-                  <p className="text-sm text-stone-500">Read-only OAuth 2.0 connection</p>
+                  <h3 className="font-bold text-white">{authModal.label}</h3>
+                  <p className="text-sm text-stone-400">Read-only OAuth 2.0 connection</p>
                 </div>
               </div>
 
@@ -306,7 +306,7 @@ export function ConnectorsPanel() {
 
               <button
                 onClick={() => setPermissionStep("scopes")}
-                className="w-full rounded-lg bg-stone-900 px-4 py-3 text-sm font-bold text-white transition hover:bg-stone-800"
+                className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-stone-800"
               >
                 Review Permissions
               </button>
@@ -315,7 +315,7 @@ export function ConnectorsPanel() {
 
           {permissionStep === "scopes" && (
             <div className="flex flex-col gap-5">
-              <p className="text-sm text-stone-500">
+              <p className="text-sm text-stone-400">
                 PLOS is requesting the following permissions from your {authModal.label} account:
               </p>
 
@@ -327,7 +327,7 @@ export function ConnectorsPanel() {
                     <div
                       key={scope}
                       className={`flex items-start gap-3 rounded-xl p-3 ${
-                        isActionScope ? "bg-amber-50 border border-amber-200" : "bg-stone-50 border border-stone-100"
+                        isActionScope ? "bg-amber-50 border border-amber-200" : "bg-black/20 border border-white/5"
                       }`}
                     >
                       <div className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
@@ -344,8 +344,8 @@ export function ConnectorsPanel() {
                         )}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-stone-800">{scope}</p>
-                        <p className="text-xs text-stone-500">{description ?? "Standard permission scope"}</p>
+                        <p className="text-sm font-bold text-stone-200">{scope}</p>
+                        <p className="text-xs text-stone-400">{description ?? "Standard permission scope"}</p>
                         {isActionScope && (
                           <p className="mt-1 text-[10px] font-bold text-amber-700 uppercase tracking-wide">
                             Requires approval before use
@@ -360,13 +360,13 @@ export function ConnectorsPanel() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setPermissionStep("overview")}
-                  className="flex-1 rounded-lg border border-stone-200 px-4 py-2.5 text-sm font-semibold text-stone-600 transition hover:bg-stone-50"
+                  className="flex-1 rounded-lg border border-white/10 px-4 py-2.5 text-sm font-semibold text-stone-400 transition hover:bg-black/20"
                 >
                   Back
                 </button>
                 <button
                   onClick={() => void handleConnect(authModal.provider)}
-                  className="flex-1 rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-stone-800"
+                  className="flex-1 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-stone-800"
                 >
                   Allow Access
                 </button>
@@ -376,8 +376,8 @@ export function ConnectorsPanel() {
 
           {permissionStep === "confirming" && (
             <div className="flex flex-col items-center gap-4 py-8">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
-              <p className="text-sm font-semibold text-stone-600">Establishing secure connection...</p>
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-white/10 border-t-stone-900" />
+              <p className="text-sm font-semibold text-stone-400">Establishing secure connection...</p>
             </div>
           )}
 
@@ -388,8 +388,8 @@ export function ConnectorsPanel() {
                   <path d="M20 6 9 17l-5-5" />
                 </svg>
               </div>
-              <p className="text-lg font-bold text-stone-950">Connected!</p>
-              <p className="text-sm text-stone-500">{authModal.label} is now linked to PLOS.</p>
+              <p className="text-lg font-bold text-white">Connected!</p>
+              <p className="text-sm text-stone-400">{authModal.label} is now linked to PLOS.</p>
             </div>
           )}
         </Modal>

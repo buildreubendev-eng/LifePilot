@@ -8,18 +8,18 @@ export function LearningPreferencesPanel() {
   ];
 
   return (
-    <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-bold text-stone-950">Personalized Learning</h2>
-      <p className="mt-2 text-sm leading-6 text-stone-600">
+    <div className="rounded-lg border border-white/10 bg-black/40 p-5 shadow-sm">
+      <h2 className="text-lg font-bold text-white">Personalized Learning</h2>
+      <p className="mt-2 text-sm leading-6 text-stone-400">
         PLOS learns from how you interact with your life admin to provide better rankings and suggestions. You can disable this learning at any time.
       </p>
       
       <div className="mt-4 grid gap-3">
         {preferences.map((pref) => (
-          <label key={pref.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg bg-stone-50 p-4">
+          <label key={pref.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg bg-black/20 p-4">
             <div>
-              <span className="font-semibold text-stone-800">{pref.title}</span>
-              <p className="text-sm text-stone-600 mt-1">{pref.description}</p>
+              <span className="font-semibold text-stone-200">{pref.title}</span>
+              <p className="text-sm text-stone-400 mt-1">{pref.description}</p>
             </div>
             <div className="shrink-0">
               <Checkbox defaultChecked />

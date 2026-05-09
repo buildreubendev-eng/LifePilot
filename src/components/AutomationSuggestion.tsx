@@ -32,7 +32,7 @@ export function AutomationSuggestion({ category }: { itemTitle: string; category
       </p>
       <div className="mt-4 flex gap-3">
         <button onClick={() => setStatus("approved")} className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Approve Automation</button>
-        <button onClick={() => setStatus("declined")} className="rounded-md bg-white border border-indigo-200 px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">Not Right Now</button>
+        <button onClick={() => setStatus("declined")} className="rounded-md bg-black/40 border border-indigo-200 px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">Not Right Now</button>
       </div>
     </div>
   );

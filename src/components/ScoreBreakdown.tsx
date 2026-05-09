@@ -24,14 +24,14 @@ export function ScoreBreakdown({ task }: { task: LifeAdminTask }) {
     <div className="grid gap-1.5">
       {entries.map(([key, value]) => (
         <div key={key} className="flex items-center gap-2 text-[11px]">
-          <span className="w-16 font-semibold text-stone-500">{factorLabels[key] ?? key}</span>
-          <div className="flex-1 h-1.5 rounded-full bg-stone-100 overflow-hidden">
+          <span className="w-16 font-semibold text-stone-400">{factorLabels[key] ?? key}</span>
+          <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${factorColors[key] ?? "bg-stone-400"}`}
               style={{ width: `${(value / maxValue) * 100}%` }}
             />
           </div>
-          <span className="w-6 text-right font-bold text-stone-600 tabular-nums">+{value}</span>
+          <span className="w-6 text-right font-bold text-stone-400 tabular-nums">+{value}</span>
         </div>
       ))}
     </div>

@@ -44,8 +44,8 @@ export function WeeklyBriefingView() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
-          <p className="mt-4 text-sm font-semibold text-stone-600">Generating your weekly briefing...</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-white/10 border-t-stone-900" />
+          <p className="mt-4 text-sm font-semibold text-stone-400">Generating your weekly briefing...</p>
         </div>
       </div>
     );
@@ -55,7 +55,7 @@ export function WeeklyBriefingView() {
     return (
       <div>
         <section className="py-4">
-          <h1 className="text-4xl font-black text-stone-950">Weekly Briefing</h1>
+          <h1 className="text-4xl font-black text-white">Weekly Briefing</h1>
         </section>
         <div className="rounded-md bg-red-100 px-3 py-2 text-sm font-semibold text-red-800">{error}</div>
       </div>
@@ -69,16 +69,16 @@ export function WeeklyBriefingView() {
   return (
     <div>
       <section className="py-4">
-        <h1 className="text-4xl font-black text-stone-950">Weekly Briefing</h1>
-        <p className="mt-3 max-w-3xl text-base leading-7 text-stone-600">
+        <h1 className="text-4xl font-black text-white">Weekly Briefing</h1>
+        <p className="mt-3 max-w-3xl text-base leading-7 text-stone-400">
           A calm summary of what needs attention, what can wait, and where PLOS recommends action.
         </p>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
         {briefing.recommendedActions.map((action) => (
-          <div key={action} className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm">
-            <p className="text-sm font-semibold text-stone-950">{action}</p>
+          <div key={action} className="rounded-lg border border-white/10 bg-black/40 p-4 shadow-sm">
+            <p className="text-sm font-semibold text-white">{action}</p>
           </div>
         ))}
       </section>

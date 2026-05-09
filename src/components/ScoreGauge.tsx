@@ -48,13 +48,13 @@ export function ScoreGauge({ score, size = 160 }: { score: number; size?: number
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-4xl font-black tabular-nums text-stone-950">{score}</span>
-          <span className="text-xs font-semibold text-stone-500">/100</span>
+          <span className="text-4xl font-black tabular-nums text-white">{score}</span>
+          <span className="text-xs font-semibold text-stone-400">/100</span>
         </div>
       </div>
       <div className="flex items-center gap-2">
         <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: color }} />
-        <span className="text-sm font-bold text-stone-700">{label}</span>
+        <span className="text-sm font-bold text-stone-300">{label}</span>
       </div>
     </div>
   );

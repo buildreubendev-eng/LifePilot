@@ -92,8 +92,8 @@ export function InboxDetailView({ id }: { id: string }) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
-          <p className="mt-4 text-sm font-semibold text-stone-600">Loading item...</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-white/10 border-t-stone-900" />
+          <p className="mt-4 text-sm font-semibold text-stone-400">Loading item...</p>
         </div>
       </div>
     );
@@ -125,16 +125,16 @@ export function InboxDetailView({ id }: { id: string }) {
 
   return (
     <div className="mx-auto max-w-5xl py-4 animate-fade-in">
-      <Link href="/inbox" className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-500 hover:text-stone-950 transition">
+      <Link href="/inbox" className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-400 hover:text-white transition">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="15,18 9,12 15,6" />
         </svg>
         Back to AI Inbox
       </Link>
 
-      <div className="mt-4 rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+      <div className="mt-4 rounded-2xl border border-white/10 bg-black/40 shadow-sm overflow-hidden">
         {/* Hero header */}
-        <div className="border-b border-stone-100 bg-gradient-to-r from-stone-50 to-white p-6">
+        <div className="border-b border-white/5 bg-gradient-to-r from-stone-50 to-white p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="flex flex-wrap gap-2">
@@ -143,7 +143,7 @@ export function InboxDetailView({ id }: { id: string }) {
                 <Badge variant={currentItem.status}>{currentItem.status}</Badge>
                 <Badge variant="score">Score {task.score}</Badge>
               </div>
-              <h1 className="mt-4 text-3xl font-black text-stone-950">{currentItem.title}</h1>
+              <h1 className="mt-4 text-3xl font-black text-white">{currentItem.title}</h1>
               <div className="mt-3 flex items-center gap-3">
                 {sourceInfo && (
                   <span className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold ${sourceInfo.color}`}>
@@ -151,13 +151,13 @@ export function InboxDetailView({ id }: { id: string }) {
                     {item.source}
                   </span>
                 )}
-                <span className="text-sm text-stone-500">from {currentItem.sender}</span>
+                <span className="text-sm text-stone-400">from {currentItem.sender}</span>
               </div>
             </div>
-            <div className="rounded-xl bg-stone-100 px-4 py-3 text-center">
+            <div className="rounded-xl bg-white/5 px-4 py-3 text-center">
               <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Due</p>
-              <p className="mt-1 text-sm font-bold text-stone-800">{formatRelativeDueDate(currentItem.dueDate)}</p>
-              <p className="text-xs text-stone-500">{formatDate(currentItem.dueDate)}</p>
+              <p className="mt-1 text-sm font-bold text-stone-200">{formatRelativeDueDate(currentItem.dueDate)}</p>
+              <p className="text-xs text-stone-400">{formatDate(currentItem.dueDate)}</p>
             </div>
           </div>
         </div>
@@ -165,29 +165,29 @@ export function InboxDetailView({ id }: { id: string }) {
         <div className="p-6">
           {/* Key metrics */}
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-xl bg-stone-50 p-4">
+            <div className="rounded-xl bg-black/20 p-4">
               <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Confidence</p>
               <div className="mt-2">
                 <ConfidenceIndicator score={item.confidence} />
               </div>
             </div>
-            <div className="rounded-xl bg-stone-50 p-4">
+            <div className="rounded-xl bg-black/20 p-4">
               <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Financial Impact</p>
-              <p className="mt-2 text-lg font-bold text-stone-950">{item.financialImpact ? `$${item.financialImpact.toFixed(2)}` : "Not detected"}</p>
+              <p className="mt-2 text-lg font-bold text-white">{item.financialImpact ? `$${item.financialImpact.toFixed(2)}` : "Not detected"}</p>
             </div>
-            <div className="rounded-xl bg-stone-50 p-4">
+            <div className="rounded-xl bg-black/20 p-4">
               <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Received</p>
-              <p className="mt-2 text-sm font-bold text-stone-950">{new Date(item.receivedAt).toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}</p>
-              <p className="text-xs text-stone-500">{new Date(item.receivedAt).toLocaleTimeString("en", { hour: "numeric", minute: "2-digit" })}</p>
+              <p className="mt-2 text-sm font-bold text-white">{new Date(item.receivedAt).toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}</p>
+              <p className="text-xs text-stone-400">{new Date(item.receivedAt).toLocaleTimeString("en", { hour: "numeric", minute: "2-digit" })}</p>
             </div>
           </div>
 
           {/* Content columns */}
           <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
             <section>
-              <h2 className="text-lg font-bold text-stone-950">Original Message</h2>
-              <div className="mt-3 rounded-xl bg-stone-50 p-5 text-sm leading-7 text-stone-700 border border-stone-100">
-                <div className="flex items-center gap-2 mb-3 pb-3 border-b border-stone-200">
+              <h2 className="text-lg font-bold text-white">Original Message</h2>
+              <div className="mt-3 rounded-xl bg-black/20 p-5 text-sm leading-7 text-stone-300 border border-white/5">
+                <div className="flex items-center gap-2 mb-3 pb-3 border-b border-white/10">
                   {sourceInfo && (
                     <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold ${sourceInfo.color}`}>
                       {sourceInfo.icon}
@@ -203,13 +203,13 @@ export function InboxDetailView({ id }: { id: string }) {
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-stone-950">Source-Specific Extraction</h2>
-              <div className="mt-3 divide-y divide-stone-100 rounded-xl border border-stone-200 overflow-hidden">
+              <h2 className="text-lg font-bold text-white">Source-Specific Extraction</h2>
+              <div className="mt-3 divide-y divide-stone-100 rounded-xl border border-white/10 overflow-hidden">
                 {item.extractedFields.map((field) => (
-                  <div key={field.label} className="flex flex-col gap-1.5 p-3.5 hover:bg-stone-50 transition-colors">
+                  <div key={field.label} className="flex flex-col gap-1.5 p-3.5 hover:bg-black/20 transition-colors">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold text-stone-600">{field.label}</span>
-                      <span className="text-right text-sm font-semibold text-stone-950">{field.value}</span>
+                      <span className="text-sm font-bold text-stone-400">{field.label}</span>
+                      <span className="text-right text-sm font-semibold text-white">{field.value}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       {sourceInfo && (
@@ -237,20 +237,20 @@ export function InboxDetailView({ id }: { id: string }) {
 
           {/* Model explainability + suggested action */}
           <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-xl border border-stone-200 p-5 bg-white">
+            <div className="rounded-xl border border-white/10 p-5 bg-black/40">
               <div className="flex items-center gap-2 mb-3">
-                <h2 className="text-lg font-bold text-stone-950">Model Explainability</h2>
+                <h2 className="text-lg font-bold text-white">Model Explainability</h2>
                 <Badge variant="score">Score {task.score}</Badge>
               </div>
-              <p className="text-sm leading-6 text-stone-600">{item.flaggedReason}</p>
-              <div className="mt-4 pt-4 border-t border-stone-100">
+              <p className="text-sm leading-6 text-stone-400">{item.flaggedReason}</p>
+              <div className="mt-4 pt-4 border-t border-white/5">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Ranking Factors</h3>
                 <ScoreBreakdown task={task} />
               </div>
             </div>
-            <div className="rounded-xl border border-stone-200 p-5 bg-white">
-              <h2 className="text-lg font-bold text-stone-950">Suggested Next Action</h2>
-              <p className="mt-3 text-sm leading-6 text-stone-600">{item.suggestedAction}</p>
+            <div className="rounded-xl border border-white/10 p-5 bg-black/40">
+              <h2 className="text-lg font-bold text-white">Suggested Next Action</h2>
+              <p className="mt-3 text-sm leading-6 text-stone-400">{item.suggestedAction}</p>
               {item.needsReply && (
                 <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
                   <p className="text-xs font-bold text-amber-800">⚡ Reply Required</p>
@@ -268,8 +268,8 @@ export function InboxDetailView({ id }: { id: string }) {
           )}
 
           {/* Actions */}
-          <div className="mt-6 rounded-xl bg-stone-50 border border-stone-100 p-5">
-            <h2 className="text-lg font-bold text-stone-950">Actions</h2>
+          <div className="mt-6 rounded-xl bg-black/20 border border-white/5 p-5">
+            <h2 className="text-lg font-bold text-white">Actions</h2>
             <div className="mt-4 flex flex-col gap-4">
               <StatusControl value={item.status} onChange={(status) => setItemStatus(item.id, status)} />
               {(actionMessage || error) ? (
@@ -290,7 +290,7 @@ export function InboxDetailView({ id }: { id: string }) {
                   type="button"
                   onClick={() => setIsSnoozeOpen(true)}
                   disabled={actionLoading}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 text-sm font-semibold text-stone-800 ring-1 ring-stone-200 transition hover:bg-stone-50 disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 rounded-lg bg-black/40 px-4 py-3 text-sm font-semibold text-stone-200 ring-1 border border-white/10 transition hover:bg-black/20 disabled:opacity-50"
                   aria-label="Snooze item"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -307,7 +307,7 @@ export function InboxDetailView({ id }: { id: string }) {
                     className={`flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition disabled:opacity-50 ${
                       item.documentSavedAt
                         ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                        : "bg-white text-stone-800 ring-1 ring-stone-200 hover:bg-stone-50"
+                        : "bg-black/40 text-stone-200 ring-1 border border-white/10 hover:bg-black/20"
                     }`}
                     aria-label="Save document"
                   >
@@ -325,7 +325,7 @@ export function InboxDetailView({ id }: { id: string }) {
                   className={`flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition disabled:opacity-50 ${
                     item.taskCreatedAt
                       ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                      : "bg-white text-stone-800 ring-1 ring-stone-200 hover:bg-stone-50"
+                      : "bg-black/40 text-stone-200 ring-1 border border-white/10 hover:bg-black/20"
                   }`}
                   aria-label="Create task"
                 >

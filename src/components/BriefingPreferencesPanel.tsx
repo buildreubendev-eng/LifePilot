@@ -45,9 +45,9 @@ export function BriefingPreferencesPanel() {
   }
 
   return (
-    <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-bold text-stone-950">Weekly Briefing Delivery</h2>
-      <p className="mt-2 text-sm leading-6 text-stone-600">
+    <div className="rounded-lg border border-white/10 bg-black/40 p-5 shadow-sm">
+      <h2 className="text-lg font-bold text-white">Weekly Briefing Delivery</h2>
+      <p className="mt-2 text-sm leading-6 text-stone-400">
         Configure how and when you want to receive your weekly summary.
       </p>
 
@@ -55,11 +55,11 @@ export function BriefingPreferencesPanel() {
 
       <div className="mt-4 grid gap-4">
         <div>
-          <label className="block text-sm font-semibold text-stone-700">Briefing Day</label>
+          <label className="block text-sm font-semibold text-stone-300">Briefing Day</label>
           <select
             value={settings?.weeklyBriefingDay ?? "Friday"}
             onChange={(e) => void updateDay(e.target.value as UserSettings["weeklyBriefingDay"])}
-            className="mt-2 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-1 focus:ring-stone-900"
+            className="mt-2 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-stone-900"
           >
             {days.map((day) => (
               <option key={day} value={day}>{day}</option>
@@ -68,19 +68,19 @@ export function BriefingPreferencesPanel() {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-stone-700">Delivery Methods</label>
+          <label className="block text-sm font-semibold text-stone-300">Delivery Methods</label>
           <div className="mt-2 grid gap-2">
             <label className="flex items-center gap-2">
               <Checkbox defaultChecked />
-              <span className="text-sm text-stone-700">Push Notification</span>
+              <span className="text-sm text-stone-300">Push Notification</span>
             </label>
             <label className="flex items-center gap-2">
               <Checkbox defaultChecked />
-              <span className="text-sm text-stone-700">Email summary</span>
+              <span className="text-sm text-stone-300">Email summary</span>
             </label>
             <label className="flex items-center gap-2">
               <Checkbox />
-              <span className="text-sm text-stone-700">SMS (Important items only)</span>
+              <span className="text-sm text-stone-300">SMS (Important items only)</span>
             </label>
           </div>
         </div>

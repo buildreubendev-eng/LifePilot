@@ -117,8 +117,8 @@ export function DocumentsView() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
-          <p className="mt-4 text-sm font-semibold text-stone-600">Loading documents...</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-white/10 border-t-stone-900" />
+          <p className="mt-4 text-sm font-semibold text-stone-400">Loading documents...</p>
         </div>
       </div>
     );
@@ -129,17 +129,17 @@ export function DocumentsView() {
       <section className="py-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-4xl font-black text-stone-950">Document Vault</h1>
-            <p className="mt-3 max-w-3xl text-base leading-7 text-stone-600">
+            <h1 className="text-4xl font-black text-white">Document Vault</h1>
+            <p className="mt-3 max-w-3xl text-base leading-7 text-stone-400">
               Receipts, confirmations, forms, and tax records that PLOS recommends saving. Search, filter, and organize your important documents.
             </p>
           </div>
           {/* View mode toggle */}
-          <div className="shrink-0 flex items-center gap-1 rounded-lg bg-stone-100 p-1">
+          <div className="shrink-0 flex items-center gap-1 rounded-lg bg-white/5 p-1">
             <button
               type="button"
               onClick={() => setViewMode("grid")}
-              className={`rounded-md p-2 transition ${viewMode === "grid" ? "bg-white shadow-sm text-stone-900" : "text-stone-400 hover:text-stone-600"}`}
+              className={`rounded-md p-2 transition ${viewMode === "grid" ? "bg-black/40 shadow-sm text-white" : "text-stone-400 hover:text-stone-400"}`}
               aria-label="Grid view"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -152,7 +152,7 @@ export function DocumentsView() {
             <button
               type="button"
               onClick={() => setViewMode("list")}
-              className={`rounded-md p-2 transition ${viewMode === "list" ? "bg-white shadow-sm text-stone-900" : "text-stone-400 hover:text-stone-600"}`}
+              className={`rounded-md p-2 transition ${viewMode === "list" ? "bg-black/40 shadow-sm text-white" : "text-stone-400 hover:text-stone-400"}`}
               aria-label="List view"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -179,13 +179,13 @@ export function DocumentsView() {
               placeholder="Search vault..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-stone-200 py-2.5 pl-10 pr-4 text-sm placeholder:text-stone-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-lg border border-white/10 py-2.5 pl-10 pr-4 text-sm placeholder:text-stone-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
           </div>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-700 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="rounded-lg border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-stone-300 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
@@ -199,7 +199,7 @@ export function DocumentsView() {
             type="button"
             onClick={() => setCategoryFilter("all")}
             className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-              categoryFilter === "all" ? "bg-stone-900 text-white" : "bg-white text-stone-600 ring-1 ring-stone-200 hover:bg-stone-50"
+              categoryFilter === "all" ? "bg-emerald-600 text-white" : "bg-black/40 text-stone-400 ring-1 border border-white/10 hover:bg-black/20"
             }`}
           >
             All ({savedDocuments.length + documents.length})
@@ -214,8 +214,8 @@ export function DocumentsView() {
                 onClick={() => setCategoryFilter(cat)}
                 className={`rounded-lg px-3 py-1.5 text-xs font-bold capitalize transition ${
                   categoryFilter === cat
-                    ? "bg-stone-900 text-white"
-                    : `${categoryColors[cat] ?? "bg-stone-100 text-stone-700"} ring-1 ring-stone-200 hover:shadow-sm`
+                    ? "bg-emerald-600 text-white"
+                    : `${categoryColors[cat] ?? "bg-white/5 text-stone-300"} ring-1 border border-white/10 hover:shadow-sm`
                 }`}
               >
                 {cat} ({count})
@@ -252,15 +252,15 @@ export function DocumentsView() {
             {filteredSaved.map((document) => (
               <div
                 key={document.id}
-                className={`rounded-xl border bg-white shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
-                  document.status === "saved" ? "border-stone-200" :
-                  document.status === "archived" ? "border-stone-100 opacity-75" :
+                className={`rounded-xl border bg-black/40 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
+                  document.status === "saved" ? "border-white/10" :
+                  document.status === "archived" ? "border-white/5 opacity-75" :
                   "border-amber-200"
                 } ${viewMode === "list" ? "p-3" : "p-4"}`}
               >
                 <div className={`flex ${viewMode === "list" ? "items-center gap-4" : "flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"}`}>
                   <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div className={`shrink-0 flex h-10 w-10 items-center justify-center rounded-lg ${categoryColors[document.category] ?? "bg-stone-100"}`}>
+                    <div className={`shrink-0 flex h-10 w-10 items-center justify-center rounded-lg ${categoryColors[document.category] ?? "bg-white/5"}`}>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
                         <polyline points="14,2 14,8 20,8" />
@@ -268,7 +268,7 @@ export function DocumentsView() {
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold capitalize ${categoryColors[document.category] ?? "bg-stone-100 text-stone-700"}`}>
+                        <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold capitalize ${categoryColors[document.category] ?? "bg-white/5 text-stone-300"}`}>
                           {document.category}
                         </span>
                         {sourceIcons[document.source] && (
@@ -277,15 +277,15 @@ export function DocumentsView() {
                           </span>
                         )}
                       </div>
-                      <h3 className="mt-1 text-sm font-bold text-stone-950 truncate">{document.title}</h3>
-                      <p className="mt-0.5 text-xs text-stone-500">
+                      <h3 className="mt-1 text-sm font-bold text-white truncate">{document.title}</h3>
+                      <p className="mt-0.5 text-xs text-stone-400">
                         Saved {new Date(document.savedAt).toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}
                       </p>
                     </div>
                   </div>
                   <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold ${
                     document.status === "saved" ? "bg-emerald-100 text-emerald-800" :
-                    document.status === "archived" ? "bg-stone-200 text-stone-600" :
+                    document.status === "archived" ? "bg-white/10 text-stone-400" :
                     "bg-amber-100 text-amber-800"
                   }`}>{document.status}</span>
                 </div>

@@ -8,6 +8,7 @@ import { ItemCard } from "@/components/ItemCard";
 import { Section } from "@/components/Section";
 import type { LifeAdminCategory, LifeAdminStatus } from "@/lib/types";
 import { usePlosStore } from "@/lib/usePlosStore";
+import { RefreshCw, Search } from 'lucide-react';
 
 type StatusFilter = LifeAdminStatus | "all";
 
@@ -91,64 +92,71 @@ export function InboxView() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
-          <p className="mt-4 text-sm font-semibold text-stone-600">Loading inbox...</p>
+      <div className="flex min-h-[60vh] items-center justify-center py-20">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-500" />
+          <p className="tracking-widest uppercase text-stone-500 text-sm font-semibold">Loading Inbox</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="animate-fade-in pb-20">
       <section className="py-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-black text-stone-950">AI Inbox</h1>
-            <p className="mt-3 max-w-3xl text-base leading-7 text-stone-600">
-              Parsed life-admin items from realistic mock messages. Search, filter, and batch triage before future email and calendar integrations.
+            <h1 className="text-4xl font-extrabold text-white tracking-tight">AI Inbox</h1>
+            <p className="mt-3 max-w-3xl text-lg font-light leading-7 text-stone-400">
+              Parsed life-admin items from connected communication channels. Secure triage environment.
             </p>
           </div>
           <button
             type="button"
             onClick={() => void handleResetDemoData()}
-            className="w-fit rounded-md bg-white px-3 py-2 text-sm font-semibold text-stone-700 ring-1 ring-stone-200 transition hover:bg-stone-50"
+            className="flex items-center gap-2 w-fit rounded-full bg-white/5 border border-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 hover:border-white/20"
           >
-            Reset Demo Data
+            <RefreshCw size={14} />
+            Reset Data
           </button>
         </div>
       </section>
-      {error ? <div className="mb-4 rounded-md bg-red-100 px-3 py-2 text-sm font-semibold text-red-800">{error}</div> : null}
-      {notice ? <div className="mb-4 rounded-md bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-800">{notice}</div> : null}
-      <div className="mb-4 grid gap-4 rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
-        <label className="grid gap-1.5">
-          <span className="text-xs font-bold uppercase tracking-widest text-stone-400">Search inbox</span>
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search title, sender, source, action, or message..."
-            className="rounded-lg border border-stone-200 bg-stone-50 px-3 py-2.5 text-sm outline-none transition placeholder:text-stone-400 focus:border-emerald-400 focus:bg-white focus:ring-2 focus:ring-emerald-100"
-          />
+
+      {error ? <div className="mb-6 rounded-lg bg-red-950/50 border border-red-500/30 px-4 py-3 text-sm font-medium text-red-200">{error}</div> : null}
+      {notice ? <div className="mb-6 rounded-lg border border-emerald-500/30 bg-emerald-950/30 px-4 py-3 text-sm font-medium text-emerald-200">{notice}</div> : null}
+      
+      <div className="mb-8 grid gap-5 rounded-2xl border border-white/5 bg-black/40 p-6 shadow-2xl backdrop-blur-xl">
+        <label className="grid gap-2 relative">
+          <span className="text-xs font-bold uppercase tracking-[0.2em] text-stone-500">Search inbox</span>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500" size={16} />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search title, sender, source, action..."
+              className="w-full rounded-xl border border-white/10 bg-black/60 pl-10 pr-4 py-3 text-sm text-white outline-none transition placeholder:text-stone-600 focus:border-emerald-500/50 focus:bg-black focus:ring-1 focus:ring-emerald-500/50"
+            />
+          </div>
         </label>
-        <div className="grid gap-4">
+        
+        <div className="grid gap-5 sm:grid-cols-2">
           <div className="grid gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-stone-400">Category</span>
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-stone-500">Category</span>
             <CategoryFilter value={category} onChange={setCategory} compact />
           </div>
           <div className="grid gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-stone-400">Status</span>
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-stone-500">Status</span>
             <div className="flex flex-wrap gap-2">
               {statusOptions.map((option) => (
                 <button
                   key={option.value}
                   type="button"
                   onClick={() => setStatus(option.value)}
-                  className={`rounded-md px-2.5 py-1.5 text-xs font-bold transition ${
+                  className={`rounded-lg px-3 py-2 text-xs font-bold transition-all ${
                     status === option.value
-                      ? "bg-stone-900 text-white"
-                      : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                      ? "bg-emerald-600 text-white shadow-lg shadow-emerald-900/20"
+                      : "bg-white/5 border border-white/5 text-stone-400 hover:bg-white/10 hover:text-white"
                   }`}
                 >
                   {option.label}
@@ -158,7 +166,7 @@ export function InboxView() {
                 <button
                   type="button"
                   onClick={handleClearFilters}
-                  className="rounded-md px-2.5 py-1.5 text-xs font-bold text-stone-500 ring-1 ring-stone-200 transition hover:bg-stone-50"
+                  className="rounded-lg px-3 py-2 text-xs font-bold text-stone-500 border border-white/10 transition hover:bg-white/5 hover:text-stone-300"
                 >
                   Clear filters
                 </button>
@@ -167,6 +175,7 @@ export function InboxView() {
           </div>
         </div>
       </div>
+
       <Section
         title={`Parsed Items (${filtered.length})`}
         action={
@@ -177,7 +186,7 @@ export function InboxView() {
             </div>
             <button
               onClick={handleToggleBatchMode}
-              className={`rounded-md px-3 py-1.5 text-sm font-semibold transition ${isBatchMode ? "bg-stone-900 text-white" : "bg-white text-stone-700 ring-1 ring-stone-200 hover:bg-stone-50"}`}
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${isBatchMode ? "bg-emerald-600 text-white shadow-lg shadow-emerald-900/20" : "bg-white/5 text-stone-300 border border-white/10 hover:bg-white/10 hover:text-white"}`}
             >
               {isBatchMode ? "Cancel Batch" : "Batch Triage"}
             </button>
@@ -187,7 +196,7 @@ export function InboxView() {
         {filtered.length === 0 ? (
           <EmptyState title="Inbox zero!" copy="Your life admin is all caught up." icon="success" />
         ) : (
-          <div className="grid gap-3 lg:grid-cols-2 stagger-children">
+          <div className="grid gap-4 lg:grid-cols-2 stagger-children">
             {filtered.map((item) => (
               <ItemCard
                 key={item.id}
@@ -200,41 +209,43 @@ export function InboxView() {
           </div>
         )}
       </Section>
+
       {isBatchMode && selectedIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 rounded-full bg-stone-900 px-6 py-3 text-white shadow-xl z-50">
-          <span className="text-sm font-semibold">{selectedIds.size} selected</span>
-          <div className="h-4 w-px bg-stone-700" />
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 rounded-full bg-emerald-950/90 border border-emerald-500/30 backdrop-blur-xl px-6 py-3 text-white shadow-2xl z-50">
+          <span className="text-sm font-semibold tracking-wide">{selectedIds.size} selected</span>
+          <div className="h-4 w-px bg-emerald-500/30" />
           <button
             onClick={() => void handleBatchStatus("reviewed")}
             disabled={batchProcessing}
-            className="text-sm font-bold text-emerald-400 hover:text-emerald-300 disabled:opacity-50"
+            className="text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors disabled:opacity-50"
           >
             {batchProcessing ? "Processing..." : "Review"}
           </button>
           <button
             onClick={() => void handleBatchStatus("completed")}
             disabled={batchProcessing}
-            className="text-sm font-bold text-blue-300 hover:text-blue-200 disabled:opacity-50"
+            className="text-sm font-bold text-blue-400 hover:text-blue-300 transition-colors disabled:opacity-50"
           >
             Complete
           </button>
           <button
             onClick={() => void handleBatchStatus("ignored")}
             disabled={batchProcessing}
-            className="text-sm font-bold text-stone-300 hover:text-white disabled:opacity-50"
+            className="text-sm font-bold text-stone-400 hover:text-stone-300 transition-colors disabled:opacity-50"
           >
             Ignore
           </button>
         </div>
       )}
+      
       {isBatchMode && selectedIds.size === 0 && filtered.length > 0 && (
-        <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-full bg-white px-6 py-3 text-stone-800 shadow-xl ring-1 ring-stone-200">
-          <span className="text-sm font-semibold">Batch mode</span>
-          <div className="h-4 w-px bg-stone-200" />
+        <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-full bg-black/80 backdrop-blur-xl px-6 py-3 text-stone-300 shadow-2xl border border-white/10">
+          <span className="text-sm font-semibold">Batch mode active</span>
+          <div className="h-4 w-px bg-white/10" />
           <button
             type="button"
             onClick={handleSelectVisible}
-            className="text-sm font-bold text-emerald-700 hover:text-emerald-600"
+            className="text-sm font-bold text-emerald-500 hover:text-emerald-400 transition-colors"
           >
             Select {filtered.length} visible
           </button>

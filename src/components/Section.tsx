@@ -19,13 +19,13 @@ export function Section({
 
   return (
     <section className="py-6">
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
+      <div className="mb-6 flex items-center justify-between gap-4 border-b border-white/5 pb-4">
+        <div className="flex items-center gap-3">
           {collapsible && (
             <button
               type="button"
               onClick={() => setIsOpen(!isOpen)}
-              className="flex h-6 w-6 items-center justify-center rounded-md text-stone-400 transition hover:bg-stone-100 hover:text-stone-700"
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/5 text-stone-400 transition hover:bg-white/10 hover:text-white border border-white/5"
               aria-label={isOpen ? "Collapse section" : "Expand section"}
             >
               <svg
@@ -43,7 +43,7 @@ export function Section({
               </svg>
             </button>
           )}
-          <h2 className="text-xl font-bold text-stone-950">{title}</h2>
+          <h2 className="text-xl font-extrabold text-white tracking-tight">{title}</h2>
         </div>
         {action}
       </div>

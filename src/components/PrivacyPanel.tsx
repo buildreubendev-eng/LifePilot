@@ -48,13 +48,13 @@ export function PrivacyPanel() {
           </svg>
         </div>
         <Badge variant="privacy">Privacy first</Badge>
-        <h2 className="text-lg font-bold text-stone-950">Your data stays under your control</h2>
+        <h2 className="text-lg font-bold text-white">Your data stays under your control</h2>
       </div>
       <div className="grid gap-3 md:grid-cols-2">
         {privacyPoints.map((point) => (
-          <div key={point.text} className="flex items-start gap-3 rounded-xl bg-white/60 p-3">
+          <div key={point.text} className="flex items-start gap-3 rounded-xl bg-black/40/60 p-3">
             <span className="mt-0.5 shrink-0 text-emerald-600">{point.icon}</span>
-            <p className="text-sm leading-6 text-stone-700">{point.text}</p>
+            <p className="text-sm leading-6 text-stone-300">{point.text}</p>
           </div>
         ))}
       </div>

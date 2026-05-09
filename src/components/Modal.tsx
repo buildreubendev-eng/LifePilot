@@ -48,13 +48,13 @@ export function Modal({
       <div className="absolute inset-0 bg-stone-950/40 backdrop-blur-sm animate-fade-in" />
 
       {/* Panel */}
-      <div className="relative w-full max-w-md rounded-2xl border border-stone-200 bg-white p-6 shadow-2xl animate-scale-in">
+      <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-black/40 p-6 shadow-2xl animate-scale-in">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-black text-stone-950">{title}</h2>
+          <h2 className="text-lg font-black text-white">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-stone-400 transition hover:bg-stone-100 hover:text-stone-700"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-stone-400 transition hover:bg-white/5 hover:text-stone-300"
             aria-label="Close"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

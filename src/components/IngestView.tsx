@@ -102,8 +102,8 @@ export function IngestView() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
-          <p className="mt-4 text-sm font-semibold text-stone-600">Loading ingestion data...</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-white/10 border-t-stone-900" />
+          <p className="mt-4 text-sm font-semibold text-stone-400">Loading ingestion data...</p>
         </div>
       </div>
     );
@@ -112,8 +112,8 @@ export function IngestView() {
   return (
     <div>
       <section className="py-4">
-        <h1 className="text-4xl font-black text-stone-950">Ingest</h1>
-        <p className="mt-3 max-w-3xl text-base leading-7 text-stone-600">
+        <h1 className="text-4xl font-black text-white">Ingest</h1>
+        <p className="mt-3 max-w-3xl text-base leading-7 text-stone-400">
           Submit raw provider messages and let the backend normalize them into life-admin items. This is the bridge future connectors will use.
         </p>
       </section>
@@ -128,11 +128,11 @@ export function IngestView() {
       {error ? <div className="mt-4 rounded-md bg-red-100 px-3 py-2 text-sm font-semibold text-red-800">{error}</div> : null}
 
       <Section title="Raw Message Simulator">
-        <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+        <div className="rounded-lg border border-white/10 bg-black/40 p-5 shadow-sm">
           <div className="grid gap-3 md:grid-cols-2">
-            <label className="grid gap-2 text-sm font-semibold text-stone-700">
+            <label className="grid gap-2 text-sm font-semibold text-stone-300">
               Provider
-              <select value={provider} onChange={(event) => setProvider(event.target.value as RawMessageProvider)} className="rounded-md border border-stone-300 bg-white px-3 py-2">
+              <select value={provider} onChange={(event) => setProvider(event.target.value as RawMessageProvider)} className="rounded-md border border-stone-300 bg-black/40 px-3 py-2">
                 {providers.map((option) => (
                   <option key={option} value={option}>
                     {providerLabels[option]}
@@ -140,15 +140,15 @@ export function IngestView() {
                 ))}
               </select>
             </label>
-            <label className="grid gap-2 text-sm font-semibold text-stone-700">
+            <label className="grid gap-2 text-sm font-semibold text-stone-300">
               Sender
               <input value={sender} onChange={(event) => setSender(event.target.value)} className="rounded-md border border-stone-300 px-3 py-2" placeholder="e.g. Bank of America" />
             </label>
-            <label className="grid gap-2 text-sm font-semibold text-stone-700">
+            <label className="grid gap-2 text-sm font-semibold text-stone-300">
               Subject
               <input value={subject} onChange={(event) => setSubject(event.target.value)} className="rounded-md border border-stone-300 px-3 py-2" placeholder="e.g. Your bill is due" />
             </label>
-            <label className="grid gap-2 text-sm font-semibold text-stone-700 md:row-span-2">
+            <label className="grid gap-2 text-sm font-semibold text-stone-300 md:row-span-2">
               Body
               <textarea value={body} onChange={(event) => setBody(event.target.value)} className="min-h-28 rounded-md border border-stone-300 px-3 py-2" placeholder="Paste the full message body..." />
             </label>
@@ -157,7 +157,7 @@ export function IngestView() {
             type="button"
             onClick={() => void ingest()}
             disabled={isIngesting}
-            className="mt-4 rounded-md bg-stone-900 px-4 py-3 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-50"
+            className="mt-4 rounded-md bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-50"
           >
             {isIngesting ? "Ingesting..." : "Ingest Message"}
           </button>
@@ -180,15 +180,15 @@ export function IngestView() {
         ) : (
           <div className="grid gap-3">
             {runs.map((run) => (
-              <div key={run.id} className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm">
+              <div key={run.id} className="rounded-lg border border-white/10 bg-black/40 p-4 shadow-sm">
                 <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold uppercase tracking-wide text-stone-500">{providerLabels[run.provider as RawMessageProvider] || run.provider}</p>
+                      <p className="text-sm font-semibold uppercase tracking-wide text-stone-400">{providerLabels[run.provider as RawMessageProvider] || run.provider}</p>
                       {run.notes && <span className="text-xs text-stone-400">— {run.notes}</span>}
                     </div>
-                    <h3 className="mt-1 text-base font-bold text-stone-950">{run.inputCount} message(s) ingested</h3>
-                    <p className="mt-1 text-xs text-stone-500">Started: {new Date(run.startedAt).toLocaleString()}</p>
+                    <h3 className="mt-1 text-base font-bold text-white">{run.inputCount} message(s) ingested</h3>
+                    <p className="mt-1 text-xs text-stone-400">Started: {new Date(run.startedAt).toLocaleString()}</p>
                   </div>
                   <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
                     run.status === "completed" ? "bg-emerald-100 text-emerald-800" :
@@ -197,7 +197,7 @@ export function IngestView() {
                   }`}>{run.status}</span>
                 </div>
                 {run.createdItemIds.length > 0 && (
-                  <p className="mt-2 text-sm text-stone-600">
+                  <p className="mt-2 text-sm text-stone-400">
                     Items: {run.createdItemIds.map((id) => id.slice(0, 8)).join(", ")}
                   </p>
                 )}

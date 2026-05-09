@@ -128,8 +128,8 @@ export function IntegrationsView() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
-          <p className="mt-4 text-sm font-semibold text-stone-600">Loading integrations...</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-white/10 border-t-stone-900" />
+          <p className="mt-4 text-sm font-semibold text-stone-400">Loading integrations...</p>
         </div>
       </div>
     );
@@ -138,8 +138,8 @@ export function IntegrationsView() {
   return (
     <div className="animate-fade-in">
       <section className="py-4">
-        <h1 className="text-4xl font-black text-stone-950">Integrations</h1>
-        <p className="mt-3 max-w-3xl text-base leading-7 text-stone-600">
+        <h1 className="text-4xl font-black text-white">Integrations</h1>
+        <p className="mt-3 max-w-3xl text-base leading-7 text-stone-400">
           Connector health monitoring and status management. Each provider shows sync freshness, permission scopes, and connection health.
         </p>
       </section>
@@ -195,13 +195,13 @@ export function IntegrationsView() {
                       ? "border-emerald-200 bg-gradient-to-br from-emerald-50/40 to-white"
                       : integration.status === "error"
                         ? "border-red-200 bg-gradient-to-br from-red-50/40 to-white"
-                        : "border-stone-200 bg-white"
+                        : "border-white/10 bg-black/40"
                   }`}
                 >
                   {/* Header */}
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white border border-stone-100 shadow-sm">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-black/40 border border-white/5 shadow-sm">
                         {providerIcons[integration.provider] ?? (
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-stone-400">
                             <circle cx="12" cy="12" r="10" />
@@ -209,25 +209,25 @@ export function IntegrationsView() {
                         )}
                       </div>
                       <div>
-                        <h2 className="text-lg font-bold text-stone-950">{integration.label}</h2>
-                        <p className="mt-0.5 text-sm text-stone-500">{integration.notes}</p>
+                        <h2 className="text-lg font-bold text-white">{integration.label}</h2>
+                        <p className="mt-0.5 text-sm text-stone-400">{integration.notes}</p>
                       </div>
                     </div>
                     <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold capitalize ${
                       integration.status === "connected" ? "bg-emerald-100 text-emerald-800" :
                       integration.status === "error" ? "bg-red-100 text-red-800" :
                       integration.status === "paused" ? "bg-amber-100 text-amber-800" :
-                      "bg-stone-100 text-stone-600"
+                      "bg-white/5 text-stone-400"
                     }`}>{integration.status.replaceAll("_", " ")}</span>
                   </div>
 
                   {/* Health & sync row */}
-                  <div className="mt-4 flex items-center gap-6 rounded-xl bg-stone-50 px-4 py-3">
+                  <div className="mt-4 flex items-center gap-6 rounded-xl bg-black/20 px-4 py-3">
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Health</p>
                       <p className={`mt-0.5 text-sm font-bold ${health.color}`}>{health.label}</p>
                     </div>
-                    <div className="h-8 w-px bg-stone-200" />
+                    <div className="h-8 w-px bg-white/10" />
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Last Sync</p>
                       <div className="mt-0.5 flex items-center gap-1.5">
@@ -236,13 +236,13 @@ export function IntegrationsView() {
                             health.score >= 80 ? "bg-emerald-400 animate-pulse" : health.score >= 50 ? "bg-amber-400" : "bg-red-400"
                           }`} />
                         )}
-                        <p className="text-sm font-semibold text-stone-700">{formatSyncAge(integration.lastSyncAt ?? undefined, now)}</p>
+                        <p className="text-sm font-semibold text-stone-300">{formatSyncAge(integration.lastSyncAt ?? undefined, now)}</p>
                       </div>
                     </div>
-                    <div className="h-8 w-px bg-stone-200" />
+                    <div className="h-8 w-px bg-white/10" />
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Connected</p>
-                      <p className="mt-0.5 text-sm font-semibold text-stone-700">
+                      <p className="mt-0.5 text-sm font-semibold text-stone-300">
                         {integration.connectedAt
                           ? new Date(integration.connectedAt).toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })
                           : "—"}
@@ -256,7 +256,7 @@ export function IntegrationsView() {
                       <span key={scope} className={`rounded-md px-2 py-0.5 text-[10px] font-semibold ${
                         integration.status === "connected"
                           ? "bg-emerald-100 text-emerald-700"
-                          : "bg-stone-100 text-stone-500"
+                          : "bg-white/5 text-stone-400"
                       }`}>
                         {scope}
                       </span>
@@ -268,7 +268,7 @@ export function IntegrationsView() {
                     <button
                       type="button"
                       onClick={() => setExpandedProvider(isExpanded ? null : integration.provider)}
-                      className="flex items-center gap-1 text-xs font-semibold text-stone-500 hover:text-stone-700 transition"
+                      className="flex items-center gap-1 text-xs font-semibold text-stone-400 hover:text-stone-300 transition"
                     >
                       <svg
                         width="12"
@@ -290,7 +290,7 @@ export function IntegrationsView() {
                         type="button"
                         onClick={() => void updateStatus(integration.provider, "connected")}
                         disabled={updatingProvider !== null}
-                        className="flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-stone-600 transition hover:bg-stone-50 disabled:opacity-50"
+                        className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-xs font-semibold text-stone-400 transition hover:bg-black/20 disabled:opacity-50"
                       >
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={updatingProvider === integration.provider ? "animate-spin" : ""}>
                           <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3" />
@@ -303,7 +303,7 @@ export function IntegrationsView() {
                   {/* Expanded status controls */}
                   {isExpanded && (
                     <div className="mt-3 animate-slide-up">
-                      <p className="text-xs font-semibold text-stone-500 mb-2">Set connection status:</p>
+                      <p className="text-xs font-semibold text-stone-400 mb-2">Set connection status:</p>
                       <div className="grid gap-2 grid-cols-2 sm:grid-cols-4">
                         {statusOptions.map((status) => (
                           <button
@@ -313,8 +313,8 @@ export function IntegrationsView() {
                             disabled={updatingProvider !== null}
                             className={`rounded-lg px-3 py-2 text-xs font-bold capitalize transition disabled:opacity-50 ${
                               integration.status === status
-                                ? "bg-stone-900 text-white"
-                                : "bg-white text-stone-600 ring-1 ring-stone-200 hover:bg-stone-50"
+                                ? "bg-emerald-600 text-white"
+                                : "bg-black/40 text-stone-400 ring-1 border border-white/10 hover:bg-black/20"
                             }`}
                           >
                             {status.replaceAll("_", " ")}

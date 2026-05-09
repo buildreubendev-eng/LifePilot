@@ -62,8 +62,8 @@ export function RecommendationsView() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
-          <p className="mt-4 text-sm font-semibold text-stone-600">Loading recommendations...</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-white/10 border-t-stone-900" />
+          <p className="mt-4 text-sm font-semibold text-stone-400">Loading recommendations...</p>
         </div>
       </div>
     );
@@ -72,8 +72,8 @@ export function RecommendationsView() {
   return (
     <div>
       <section className="py-4">
-        <h1 className="text-4xl font-black text-stone-950">Recommendations</h1>
-        <p className="mt-3 max-w-3xl text-base leading-7 text-stone-600">
+        <h1 className="text-4xl font-black text-white">Recommendations</h1>
+        <p className="mt-3 max-w-3xl text-base leading-7 text-stone-400">
           PLOS suggests safe next moves from inbox state. Low-risk recommendations can create tasks or save documents; sensitive actions become approval requests.
         </p>
       </section>
@@ -104,11 +104,11 @@ export function RecommendationsView() {
         ) : (
           <div className="grid gap-3">
             {recommendations.map((recommendation) => (
-              <div key={recommendation.id} className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+              <div key={recommendation.id} className="rounded-lg border border-white/10 bg-black/40 p-5 shadow-sm">
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div>
                     <div className="flex flex-wrap gap-2">
-                      <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-semibold capitalize text-stone-700">
+                      <span className="rounded-full bg-white/5 px-2.5 py-1 text-xs font-semibold capitalize text-stone-300">
                         {recommendation.actionType.replaceAll("_", " ")}
                       </span>
                       <span className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
@@ -126,18 +126,18 @@ export function RecommendationsView() {
                         {recommendation.priority}
                       </span>
                     </div>
-                    <h2 className="mt-3 text-lg font-bold text-stone-950">{recommendation.title}</h2>
-                    <p className="mt-2 text-sm leading-6 text-stone-600">{recommendation.description}</p>
-                    <p className="mt-2 text-sm font-semibold text-stone-700">{recommendation.reason}</p>
+                    <h2 className="mt-3 text-lg font-bold text-white">{recommendation.title}</h2>
+                    <p className="mt-2 text-sm leading-6 text-stone-400">{recommendation.description}</p>
+                    <p className="mt-2 text-sm font-semibold text-stone-300">{recommendation.reason}</p>
                     {recommendation.dueDate && (
-                      <p className="mt-1 text-xs text-stone-500">Due: {new Date(recommendation.dueDate + "T12:00:00").toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}</p>
+                      <p className="mt-1 text-xs text-stone-400">Due: {new Date(recommendation.dueDate + "T12:00:00").toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}</p>
                     )}
                   </div>
                   <button
                     type="button"
                     onClick={() => void acceptRecommendation(recommendation.id)}
                     disabled={processingId !== null}
-                    className="shrink-0 rounded-md bg-stone-900 px-4 py-3 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-50"
+                    className="shrink-0 rounded-md bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-50"
                   >
                     {processingId === recommendation.id ? "Processing..." : recommendation.acceptLabel}
                   </button>

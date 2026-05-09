@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { BackendStatusPill } from "@/components/BackendStatusPill";
+import { Shield } from 'lucide-react';
 
 const navigation = [
   {
@@ -146,27 +147,33 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
   const sections = [...new Set(navigation.map((n) => n.section))];
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-950">
+    <div className="min-h-screen bg-black text-white relative">
+      {/* Background ambient light */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-900/10 blur-[120px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-900/10 blur-[100px]" />
+      </div>
+
       {/* Skip to content (accessibility) */}
-      <a href="#main-content" className="skip-to-content">
+      <a href="#main-content" className="skip-to-content relative z-50">
         Skip to content
       </a>
 
       {/* Desktop sidebar */}
       <aside
-        className="fixed inset-y-0 left-0 z-40 hidden w-[260px] flex-col border-r border-stone-200 bg-white/95 backdrop-blur-sm lg:flex"
+        className="fixed inset-y-0 left-0 z-40 hidden w-[260px] flex-col border-r border-white/10 bg-black/80 backdrop-blur-xl lg:flex"
         aria-label="Main navigation"
       >
-        <div className="flex h-16 items-center gap-3 border-b border-stone-100 px-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-stone-900">
-            <span className="text-sm font-black text-white">P</span>
+        <div className="flex h-16 items-center gap-3 border-b border-white/5 px-6">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/20 border border-emerald-500/30">
+            <Shield size={18} className="text-emerald-400" />
           </div>
           <div>
-            <Link href="/" className="text-lg font-black text-stone-950 tracking-tight">
+            <Link href="/" className="text-lg font-black text-white tracking-tight">
               PLOS
             </Link>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-600">
-              Personal Life OS
+            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 opacity-80">
+              Executive
             </p>
           </div>
         </div>
@@ -174,7 +181,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
         <nav className="flex-1 overflow-y-auto custom-scrollbar px-3 py-4">
           {sections.map((section) => (
             <div key={section} className="mb-5">
-              <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-stone-400">
+              <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-stone-500">
                 {sectionLabels[section]}
               </p>
               <div className="grid gap-0.5">
@@ -188,15 +195,15 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all duration-150 ${
+                        className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
                           active
-                            ? "bg-stone-900 text-white shadow-sm"
-                            : "text-stone-600 hover:bg-stone-100 hover:text-stone-950"
+                            ? "bg-white/10 text-white shadow-sm border border-white/5"
+                            : "text-stone-400 hover:bg-white/5 hover:text-white border border-transparent"
                         }`}
                       >
                         <span
                           className={`shrink-0 transition-colors ${
-                            active ? "text-emerald-400" : "text-stone-400 group-hover:text-stone-600"
+                            active ? "text-emerald-400" : "text-stone-500 group-hover:text-stone-300"
                           }`}
                         >
                           {item.icon}
@@ -210,32 +217,32 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
 
-        <div className="border-t border-stone-100 px-4 py-3">
+        <div className="border-t border-white/5 px-4 py-3">
           <BackendStatusPill />
-          <div className="mt-2 rounded-lg bg-emerald-50 px-3 py-2.5 text-center">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-700">
-              Mock data only
+          <div className="mt-2 rounded-lg border border-emerald-500/20 bg-emerald-950/30 px-3 py-2.5 text-center">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">
+              Mock Data Demo
             </p>
-            <p className="mt-0.5 text-[10px] text-emerald-600">
-              No real integrations active
+            <p className="mt-0.5 text-[10px] text-emerald-500/80">
+              Executive Preview
             </p>
           </div>
         </div>
       </aside>
 
       {/* Mobile header */}
-      <header className="fixed inset-x-0 top-0 z-40 border-b border-stone-200 bg-white/95 backdrop-blur-sm lg:hidden">
+      <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-black/80 backdrop-blur-xl lg:hidden">
         <div className="flex h-14 items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-900">
-              <span className="text-xs font-black text-white">P</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20 border border-emerald-500/30">
+              <Shield size={16} className="text-emerald-400" />
             </div>
-            <span className="text-lg font-black text-stone-950">PLOS</span>
+            <span className="text-lg font-black text-white">PLOS</span>
           </Link>
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-stone-600 hover:bg-stone-100"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-stone-400 hover:bg-white/10 hover:text-white transition-colors"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
@@ -255,11 +262,11 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
 
         {/* Mobile menu overlay */}
         {isMobileMenuOpen && (
-          <div className="absolute inset-x-0 top-14 max-h-[70vh] overflow-y-auto border-b border-stone-200 bg-white shadow-lg animate-scale-in">
+          <div className="absolute inset-x-0 top-14 max-h-[70vh] overflow-y-auto border-b border-white/10 bg-black/95 shadow-2xl animate-scale-in backdrop-blur-xl">
             <nav className="px-3 py-3">
               {sections.map((section) => (
                 <div key={section} className="mb-3">
-                  <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest text-stone-400">
+                  <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest text-stone-500">
                     {sectionLabels[section]}
                   </p>
                   {navigation
@@ -275,11 +282,11 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
                           onClick={() => setIsMobileMenuOpen(false)}
                           className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
                             active
-                              ? "bg-stone-900 text-white"
-                              : "text-stone-600 hover:bg-stone-100"
+                              ? "bg-white/10 text-white"
+                              : "text-stone-400 hover:bg-white/5 hover:text-white"
                           }`}
                         >
-                          <span className={active ? "text-emerald-400" : "text-stone-400"}>
+                          <span className={active ? "text-emerald-400" : "text-stone-500"}>
                             {item.icon}
                           </span>
                           {item.label}
@@ -295,7 +302,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
 
       {/* Mobile bottom tab bar */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white/95 backdrop-blur-sm lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/80 backdrop-blur-xl lg:hidden"
         aria-label="Quick navigation"
       >
         <div className="mx-auto flex max-w-md items-center justify-around px-2 py-1.5">
@@ -308,13 +315,13 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={`flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-[10px] font-semibold transition ${
-                  active ? "text-stone-950" : "text-stone-400"
+                  active ? "text-white" : "text-stone-500"
                 }`}
               >
-                <span className={active ? "text-emerald-600" : ""}>{item.icon}</span>
+                <span className={active ? "text-emerald-400" : ""}>{item.icon}</span>
                 {item.label === "Weekly Briefing" ? "Briefing" : item.label}
                 {active && (
-                  <span className="h-1 w-4 rounded-full bg-emerald-600" />
+                  <span className="h-1 w-4 rounded-full bg-emerald-500" />
                 )}
               </Link>
             );
@@ -325,7 +332,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
       {/* Main content area */}
       <main
         id="main-content"
-        className="min-h-screen pt-14 pb-20 lg:pt-0 lg:pb-0 lg:pl-[260px]"
+        className="min-h-screen pt-14 pb-20 lg:pt-0 lg:pb-0 lg:pl-[260px] relative z-10"
       >
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 animate-fade-in">
           {children}

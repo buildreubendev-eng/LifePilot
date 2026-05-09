@@ -52,8 +52,8 @@ export function BackendStatusPill() {
 
   if (!health) {
     return (
-      <div className="rounded-lg bg-stone-50 px-3 py-2.5 text-center ring-1 ring-stone-100">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-stone-500">Checking backend</p>
+      <div className="rounded-lg bg-black/20 px-3 py-2.5 text-center ring-1 border border-white/5">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Checking backend</p>
         <p className="mt-0.5 text-[10px] text-stone-400">Loading status...</p>
       </div>
     );

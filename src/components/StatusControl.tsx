@@ -26,7 +26,7 @@ export function StatusControl({
           type="button"
           onClick={() => onChange(status)}
           className={`rounded-md px-3 py-2 text-sm font-semibold capitalize transition ${
-            value === status ? "bg-stone-900 text-white" : "bg-white text-stone-700 ring-1 ring-stone-200 hover:bg-stone-50"
+            value === status ? "bg-emerald-600 text-white" : "bg-black/40 text-stone-300 ring-1 border border-white/10 hover:bg-black/20"
           }`}
         >
           {labelMap[status]}
