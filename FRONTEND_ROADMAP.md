@@ -17,13 +17,16 @@ This roadmap is for UI behavior, workflow polish, responsive quality, and demo u
 - ✅ Keep the Reset Demo Data action visible but not visually dominant.
 - ✅ Fix all light-mode styling leaks across InboxDetailView source badges, hero header, and action feedback.
 
-## Phase 2: Mobile Quality Pass
+## Phase 2: Mobile Quality Pass ✅
 
-- Audit Dashboard, AI Inbox filters, item detail, Tasks, Recommendations, and bottom navigation at phone widths.
-- Ensure filter chips wrap cleanly without horizontal scrollbars.
-- Keep floating batch controls inside the viewport.
-- Make long category names, sender names, and action text wrap without breaking cards.
-- Verify tap targets are large enough for quick mobile triage.
+- ✅ Audit Dashboard, AI Inbox filters, item detail, Tasks, Recommendations, and bottom navigation at phone widths.
+- ✅ Ensure filter chips wrap cleanly without horizontal scrollbars (overflow-x: hidden, flex-wrap on CategoryFilter).
+- ✅ Keep floating batch controls inside the viewport (bottom-20 on mobile, above bottom nav).
+- ✅ Make long category names, sender names, and action text wrap without breaking cards.
+- ✅ Verify tap targets are large enough for quick mobile triage (min-h-[44px] on bottom nav, min-h-[36px] on filter chips).
+- ✅ Add safe-area-inset-bottom support for notched devices.
+- ✅ Fix body background from light (#fafaf9) to dark (#0a0a0a).
+- ✅ Add viewport-fit=cover meta tag.
 
 ## Phase 3: Trust And Explainability
 

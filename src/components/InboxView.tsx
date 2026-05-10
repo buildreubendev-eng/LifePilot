@@ -211,7 +211,7 @@ export function InboxView() {
       </Section>
 
       {isBatchMode && selectedIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 rounded-full bg-emerald-950/90 border border-emerald-500/30 backdrop-blur-xl px-6 py-3 text-white shadow-2xl z-50">
+        <div className="fixed bottom-20 lg:bottom-6 left-1/2 -translate-x-1/2 flex flex-wrap items-center justify-center gap-3 rounded-2xl bg-emerald-950/90 border border-emerald-500/30 backdrop-blur-xl px-5 py-3 text-white shadow-2xl z-50 mx-4 max-w-[calc(100vw-2rem)]">
           <span className="text-sm font-semibold tracking-wide">{selectedIds.size} selected</span>
           <div className="h-4 w-px bg-emerald-500/30" />
           <button
@@ -239,7 +239,7 @@ export function InboxView() {
       )}
       
       {isBatchMode && selectedIds.size === 0 && filtered.length > 0 && (
-        <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-full bg-black/80 backdrop-blur-xl px-6 py-3 text-stone-300 shadow-2xl border border-white/10">
+        <div className="fixed bottom-20 lg:bottom-6 left-1/2 z-50 flex flex-wrap -translate-x-1/2 items-center justify-center gap-3 rounded-2xl bg-black/80 backdrop-blur-xl px-5 py-3 text-stone-300 shadow-2xl border border-white/10 mx-4 max-w-[calc(100vw-2rem)]">
           <span className="text-sm font-semibold">Batch mode active</span>
           <div className="h-4 w-px bg-white/10" />
           <button

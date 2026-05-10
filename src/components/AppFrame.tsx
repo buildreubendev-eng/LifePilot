@@ -242,7 +242,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-stone-400 hover:bg-white/10 hover:text-white transition-colors"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-400 hover:bg-white/10 hover:text-white transition-colors"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
@@ -305,7 +305,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
         className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/80 backdrop-blur-xl lg:hidden"
         aria-label="Quick navigation"
       >
-        <div className="mx-auto flex max-w-md items-center justify-around px-2 py-1.5">
+        <div className="mx-auto flex max-w-md items-center justify-around px-1 py-2 safe-bottom">
           {mobileNavItems.map((item) => {
             const active =
               pathname === item.href ||
@@ -314,7 +314,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-[10px] font-semibold transition ${
+                className={`flex flex-col items-center gap-0.5 rounded-lg px-3 py-2 min-h-[44px] min-w-[44px] text-[10px] font-semibold transition ${
                   active ? "text-white" : "text-stone-500"
                 }`}
               >

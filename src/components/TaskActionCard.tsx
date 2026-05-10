@@ -121,7 +121,7 @@ export function TaskActionCard({
       }`}
     >
       {/* Header row */}
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <Badge variant={task.category}>{task.category}</Badge>
@@ -203,14 +203,14 @@ export function TaskActionCard({
       )}
 
       {/* Inline action buttons */}
-      <div className="mt-4 pt-3 border-t border-white/5 flex flex-wrap gap-2">
+      <div className="mt-4 pt-3 border-t border-white/5 grid grid-cols-3 gap-2">
         {availableActions.map((action) => (
           <button
             key={action.status}
             type="button"
             disabled={processing}
             onClick={() => void handleStatusChange(action.status)}
-            className={`inline-flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-1.5 text-xs font-bold text-stone-400 transition-all disabled:opacity-40 ${action.hoverColor}`}
+            className={`inline-flex items-center justify-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5 min-h-[40px] text-xs font-bold text-stone-400 transition-all disabled:opacity-40 ${action.hoverColor}`}
           >
             {action.icon}
             {action.label}

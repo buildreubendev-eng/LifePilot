@@ -19,6 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={cn("font-sans", geist.variable, "dark")} data-mantine-color-scheme="dark">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <ColorSchemeScript defaultColorScheme="dark" />
       </head>
       <body>

@@ -167,7 +167,7 @@ export function DashboardView() {
           </div>
           
           <div className="relative z-10">
-            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl mb-4">
+            <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl xl:text-6xl mb-4">
               {getGreeting()}, Reuben.
             </h1>
             <p className="max-w-xl text-lg text-stone-400 font-light leading-relaxed">
@@ -241,7 +241,7 @@ export function DashboardView() {
       </section>
 
       {/* Metrics Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-10 animate-slide-up" style={{ animationDelay: '100ms' }}>
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-5 mb-10 animate-slide-up" style={{ animationDelay: '100ms' }}>
         <MetricCard label="Priority Actions" value={tasks.length} icon={<AlertCircle size={20} />} trend="warning" />
         <MetricCard label="Due This Week" value={counts.dueThisWeek} icon={<Clock size={20} />} />
         <MetricCard label="Overdue" value={counts.overdue} icon={<AlertCircle size={20} />} trend={counts.overdue > 0 ? "danger" : "success"} />
