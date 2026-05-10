@@ -10,17 +10,17 @@ import type { DocumentRecord, LifeAdminCategory } from "@/lib/types";
 import { usePlosStore } from "@/lib/usePlosStore";
 
 const categoryColors: Record<string, string> = {
-  bill: "bg-rose-100 text-rose-800",
-  renewal: "bg-amber-100 text-amber-900",
-  appointment: "bg-sky-100 text-sky-800",
-  travel: "bg-indigo-100 text-indigo-800",
-  medical: "bg-red-100 text-red-800",
-  insurance: "bg-violet-100 text-violet-800",
-  subscription: "bg-orange-100 text-orange-900",
-  receipt: "bg-emerald-100 text-emerald-800",
-  "school/family": "bg-cyan-100 text-cyan-800",
-  "tax/document": "bg-slate-200 text-slate-800",
-  "personal reply": "bg-pink-100 text-pink-800",
+  bill: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+  renewal: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  appointment: "bg-sky-500/10 text-sky-400 border-sky-500/20",
+  travel: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+  medical: "bg-red-500/10 text-red-400 border-red-500/20",
+  insurance: "bg-violet-500/10 text-violet-400 border-violet-500/20",
+  subscription: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  receipt: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  "school/family": "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+  "tax/document": "bg-slate-500/10 text-slate-400 border-slate-500/20",
+  "personal reply": "bg-pink-500/10 text-pink-400 border-pink-500/20",
 };
 
 const sourceIcons: Record<string, React.ReactNode> = {
@@ -115,10 +115,10 @@ export function DocumentsView() {
 
   if (isLoading || itemsLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-white/10 border-t-stone-900" />
-          <p className="mt-4 text-sm font-semibold text-stone-400">Loading documents...</p>
+      <div className="flex min-h-[60vh] items-center justify-center py-20">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-500" />
+          <p className="tracking-widest uppercase text-stone-500 text-sm font-semibold">Loading Documents</p>
         </div>
       </div>
     );
@@ -129,8 +129,8 @@ export function DocumentsView() {
       <section className="py-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-4xl font-black text-white">Document Vault</h1>
-            <p className="mt-3 max-w-3xl text-base leading-7 text-stone-400">
+            <h1 className="text-4xl font-extrabold text-white tracking-tight">Document Vault</h1>
+            <p className="mt-3 max-w-3xl text-lg font-light leading-7 text-stone-400">
               Receipts, confirmations, forms, and tax records that PLOS recommends saving. Search, filter, and organize your important documents.
             </p>
           </div>
@@ -179,13 +179,13 @@ export function DocumentsView() {
               placeholder="Search vault..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-white/10 py-2.5 pl-10 pr-4 text-sm placeholder:text-stone-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-xl border border-white/10 bg-black/60 py-3 pl-10 pr-4 text-sm text-white outline-none placeholder:text-stone-600 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50"
             />
           </div>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-            className="rounded-lg border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-stone-300 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="rounded-xl border border-white/10 bg-black/60 px-3 py-3 text-sm text-white outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50"
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
@@ -236,7 +236,7 @@ export function DocumentsView() {
         />
       </div>
 
-      {error ? <div className="mt-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm font-semibold text-red-800">{error}</div> : null}
+      {error ? <div className="mt-4 rounded-lg bg-red-950/50 border border-red-500/30 px-4 py-3 text-sm font-medium text-red-200">{error}</div> : null}
 
       <Section title="Saved Records">
         {filteredSaved.length === 0 ? (
@@ -284,9 +284,9 @@ export function DocumentsView() {
                     </div>
                   </div>
                   <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold ${
-                    document.status === "saved" ? "bg-emerald-100 text-emerald-800" :
-                    document.status === "archived" ? "bg-white/10 text-stone-400" :
-                    "bg-amber-100 text-amber-800"
+                    document.status === "saved" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
+                    document.status === "archived" ? "bg-white/5 text-stone-500 border border-white/10" :
+                    "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                   }`}>{document.status}</span>
                 </div>
               </div>

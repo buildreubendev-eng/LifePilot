@@ -38,13 +38,15 @@ This roadmap is for UI behavior, workflow polish, responsive quality, and demo u
 - ✅ Use expanded ConfidenceIndicator and expanded ScoreBreakdown in InboxDetailView for maximum transparency.
 - ✅ Improve source-specific extraction display with provider badges and confidence annotations.
 
-## Phase 4: Integration-Ready UX
+## Phase 4: Integration-Ready UX ✅
 
-- Design connector setup flows for Gmail, Google Calendar, Plaid, and health portals.
-- Add connector sync health states: not connected, connected, paused, error, last sync, and next sync.
-- Add ingestion previews before creating normalized life-admin items.
-- Add document vault search and category filtering.
-- Add weekly briefing delivery preference controls.
+- ✅ Design connector setup flows for Gmail, Google Calendar, Plaid, and health portals (IntegrationsView overhaul with provider-specific icons, gradient backgrounds, setup wizard guide for disconnected providers, Connect/Disconnect CTAs).
+- ✅ Add connector sync health states: not connected, connected, paused, error, last sync, and next sync (3-column sync metrics strip per connector, estimated next sync calculation, health badges with shield icons).
+- ✅ Add ingestion previews before creating normalized life-admin items (IngestView redesign with extraction preview panel showing expected input/output, provider pill selector with icons, improved run history).
+- ✅ Add document vault search and category filtering (DocumentsView dark theme fix — replaced all light-mode category badges with dark-mode variants, improved search input styling, consistent error/status badges).
+- ✅ Add weekly briefing delivery preference controls (BriefingPreferencesPanel redesign with day-of-week pill selector, delivery time picker, detailed channel options with icons and descriptions, briefing format selector).
+- ✅ Fix SettingsView dark theme consistency (approval rules badges, error messages, category toggles, reset button — all converted to dark executive theme).
+- ✅ Fix all remaining light-mode badge artifacts across DocumentsView, ApprovalsView, and SettingsView.
 
 ## Quality Gates
 
