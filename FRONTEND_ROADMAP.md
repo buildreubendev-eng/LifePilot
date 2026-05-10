@@ -8,13 +8,14 @@ This roadmap is for UI behavior, workflow polish, responsive quality, and demo u
 - The deployed app runs through Reuben and uses mock life-admin data.
 - Recent QOL work added inbox search, status/category filters, batch triage, dashboard refresh/reset controls, and backend health status.
 
-## Phase 1: Demo-Ready Workflow Polish
+## Phase 1: Demo-Ready Workflow Polish ✅
 
-- Polish item detail actions: clearer action grouping, better confirmations, disabled duplicate states, and a tighter extracted-fields layout.
-- Improve Tasks so users can complete, review, ignore, or reopen tasks from the Tasks screen.
-- Improve Recommendations so accepted recommendations disappear or show a completed state.
-- Add stronger empty states that explain what changed after filters, reset, or completed work.
-- Keep the Reset Demo Data action visible but not visually dominant.
+- ✅ Polish item detail actions: clearer action grouping, better confirmations, disabled duplicate states, and a tighter extracted-fields layout.
+- ✅ Improve Tasks so users can complete, review, ignore, or reopen tasks from the Tasks screen (TaskActionCard).
+- ✅ Improve Recommendations so accepted recommendations show a completed state (inline accepted badge + strikethrough).
+- ✅ Add stronger empty states that explain what changed after filters, reset, or completed work.
+- ✅ Keep the Reset Demo Data action visible but not visually dominant.
+- ✅ Fix all light-mode styling leaks across InboxDetailView source badges, hero header, and action feedback.
 
 ## Phase 2: Mobile Quality Pass
 

@@ -18,7 +18,7 @@ import { usePlosStore } from "@/lib/usePlosStore";
 const sourceProviderMap: Record<string, { provider: string; color: string; icon: React.ReactNode }> = {
   Gmail: {
     provider: "gmail",
-    color: "bg-red-50 border-red-200 text-red-700",
+    color: "bg-red-500/10 border-red-500/30 text-red-400",
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
@@ -28,7 +28,7 @@ const sourceProviderMap: Record<string, { provider: string; color: string; icon:
   },
   Calendar: {
     provider: "google-calendar",
-    color: "bg-blue-50 border-blue-200 text-blue-700",
+    color: "bg-blue-500/10 border-blue-500/30 text-blue-400",
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -40,7 +40,7 @@ const sourceProviderMap: Record<string, { provider: string; color: string; icon:
   },
   "Bank alert": {
     provider: "plaid",
-    color: "bg-emerald-50 border-emerald-200 text-emerald-700",
+    color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <line x1="12" y1="1" x2="12" y2="23" />
@@ -50,7 +50,7 @@ const sourceProviderMap: Record<string, { provider: string; color: string; icon:
   },
   Portal: {
     provider: "health",
-    color: "bg-rose-50 border-rose-200 text-rose-700",
+    color: "bg-rose-500/10 border-rose-500/30 text-rose-400",
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z" />
@@ -59,7 +59,7 @@ const sourceProviderMap: Record<string, { provider: string; color: string; icon:
   },
   SMS: {
     provider: "manual",
-    color: "bg-violet-50 border-violet-200 text-violet-700",
+    color: "bg-violet-500/10 border-violet-500/30 text-violet-400",
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -68,7 +68,7 @@ const sourceProviderMap: Record<string, { provider: string; color: string; icon:
   },
   Voicemail: {
     provider: "manual",
-    color: "bg-orange-50 border-orange-200 text-orange-700",
+    color: "bg-orange-500/10 border-orange-500/30 text-orange-400",
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="5.5" cy="11.5" r="4.5" />
@@ -134,7 +134,7 @@ export function InboxDetailView({ id }: { id: string }) {
 
       <div className="mt-4 rounded-2xl border border-white/10 bg-black/40 shadow-sm overflow-hidden">
         {/* Hero header */}
-        <div className="border-b border-white/5 bg-gradient-to-r from-stone-50 to-white p-6">
+        <div className="border-b border-white/5 bg-gradient-to-r from-white/[0.03] to-transparent p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="flex flex-wrap gap-2">
@@ -252,9 +252,9 @@ export function InboxDetailView({ id }: { id: string }) {
               <h2 className="text-lg font-bold text-white">Suggested Next Action</h2>
               <p className="mt-3 text-sm leading-6 text-stone-400">{item.suggestedAction}</p>
               {item.needsReply && (
-                <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
-                  <p className="text-xs font-bold text-amber-800">⚡ Reply Required</p>
-                  <p className="text-xs text-amber-700">This item requires a personal response.</p>
+                <div className="mt-3 rounded-lg bg-amber-500/10 border border-amber-500/30 px-3 py-2">
+                  <p className="text-xs font-bold text-amber-400">⚡ Reply Required</p>
+                  <p className="text-xs text-amber-400/80">This item requires a personal response.</p>
                 </div>
               )}
             </div>
@@ -273,10 +273,10 @@ export function InboxDetailView({ id }: { id: string }) {
             <div className="mt-4 flex flex-col gap-4">
               <StatusControl value={item.status} onChange={(status) => setItemStatus(item.id, status)} />
               {(actionMessage || error) ? (
-                <div className={`rounded-lg px-4 py-3 text-sm font-semibold ${error ? "bg-red-50 border border-red-200 text-red-800" : "bg-emerald-50 border border-emerald-200 text-emerald-800"}`}>
+                <div className={`rounded-lg px-4 py-3 text-sm font-semibold ${error ? "bg-red-950/50 border border-red-500/30 text-red-200" : "bg-emerald-950/30 border border-emerald-500/30 text-emerald-200"}`}>
                   {actionMessage && (
                     <div className="flex items-center gap-2">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-600 animate-check-pop">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400 animate-check-pop">
                         <path d="M20 6 9 17l-5-5" />
                       </svg>
                       {actionMessage}
@@ -306,7 +306,7 @@ export function InboxDetailView({ id }: { id: string }) {
                     disabled={actionLoading || !!item.documentSavedAt}
                     className={`flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition disabled:opacity-50 ${
                       item.documentSavedAt
-                        ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                        ? "bg-emerald-950/30 text-emerald-400 border border-emerald-500/30"
                         : "bg-black/40 text-stone-200 ring-1 border border-white/10 hover:bg-black/20"
                     }`}
                     aria-label="Save document"
@@ -324,7 +324,7 @@ export function InboxDetailView({ id }: { id: string }) {
                   disabled={actionLoading || !!item.taskCreatedAt}
                   className={`flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition disabled:opacity-50 ${
                     item.taskCreatedAt
-                      ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                      ? "bg-emerald-950/30 text-emerald-400 border border-emerald-500/30"
                       : "bg-black/40 text-stone-200 ring-1 border border-white/10 hover:bg-black/20"
                   }`}
                   aria-label="Create task"
