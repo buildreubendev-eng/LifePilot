@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Badge } from "@/components/Badge";
 import { ConfidenceIndicator } from "@/components/ConfidenceIndicator";
 import { ScoreBreakdown } from "@/components/ScoreBreakdown";
+import { WhyThisMatters } from "@/components/WhyThisMatters";
 import { formatRelativeDueDate } from "@/lib/date";
 import type { LifeAdminMessage, LifeAdminTask } from "@/lib/types";
 
@@ -68,6 +69,7 @@ export function ItemCard({
               <ScoreBreakdown task={task} />
             </div>
           )}
+          <WhyThisMatters item={item} task={task} />
         </div>
       </div>
       <div className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold ${dueDateVariant(source.dueDate)} shadow-sm`}>

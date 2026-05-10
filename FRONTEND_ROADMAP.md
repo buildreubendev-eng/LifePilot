@@ -28,13 +28,15 @@ This roadmap is for UI behavior, workflow polish, responsive quality, and demo u
 - ✅ Fix body background from light (#fafaf9) to dark (#0a0a0a).
 - ✅ Add viewport-fit=cover meta tag.
 
-## Phase 3: Trust And Explainability
+## Phase 3: Trust And Explainability ✅
 
-- Make score and confidence explanations easier to scan.
-- Add "why this matters" summaries to high-priority items.
-- Make approval-first behavior visible near sensitive recommendations.
-- Improve source-specific extraction display for Gmail, Calendar, Plaid, health, SMS, and voicemail mock inputs.
-- Surface audit history in a way that feels useful rather than technical.
+- ✅ Make score and confidence explanations easier to scan (ScoreBreakdown redesign with visual bars, factor icons, contextual explanations, and dominant-factor summary).
+- ✅ Add "why this matters" summaries to high-priority items (new WhyThisMatters component on ItemCard and InboxDetailView — surfaces overdue, financial, reply-required, appointment, and priority reasons).
+- ✅ Make approval-first behavior visible near sensitive recommendations (ApprovalsView overhaul with trust framework banner, risk-level shield icons, action type icons, high-risk warning callouts).
+- ✅ Redesign ConfidenceIndicator with 5-tier trust levels, shield icons, and expanded mode with trust reasoning explanations.
+- ✅ Overhaul AutomationSuggestion to dark executive theme with trust framework callout explaining approval-first model.
+- ✅ Use expanded ConfidenceIndicator and expanded ScoreBreakdown in InboxDetailView for maximum transparency.
+- ✅ Improve source-specific extraction display with provider badges and confidence annotations.
 
 ## Phase 4: Integration-Ready UX
 

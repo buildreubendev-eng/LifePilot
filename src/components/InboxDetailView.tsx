@@ -11,6 +11,7 @@ import { TaskModal } from "@/components/TaskModal";
 import { AutomationSuggestion } from "@/components/AutomationSuggestion";
 import { ConfidenceIndicator } from "@/components/ConfidenceIndicator";
 import { ScoreBreakdown } from "@/components/ScoreBreakdown";
+import { WhyThisMatters } from "@/components/WhyThisMatters";
 import { formatDate, formatRelativeDueDate } from "@/lib/date";
 import { scoreLifeAdminItem } from "@/lib/prioritization";
 import { usePlosStore } from "@/lib/usePlosStore";
@@ -162,22 +163,25 @@ export function InboxDetailView({ id }: { id: string }) {
           </div>
         </div>
 
-        <div className="p-6">
-          {/* Key metrics */}
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-xl bg-black/20 p-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Confidence</p>
-              <div className="mt-2">
-                <ConfidenceIndicator score={item.confidence} />
+          <div className="p-6">
+            {/* Why This Matters banner */}
+            <div className="mb-6">
+              <WhyThisMatters item={item} task={task} />
+            </div>
+
+            {/* Key metrics */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-xl border border-white/5 bg-black/20 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2">AI Confidence</p>
+                <ConfidenceIndicator score={item.confidence} expanded />
               </div>
-            </div>
-            <div className="rounded-xl bg-black/20 p-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Financial Impact</p>
-              <p className="mt-2 text-lg font-bold text-white">{item.financialImpact ? `$${item.financialImpact.toFixed(2)}` : "Not detected"}</p>
-            </div>
-            <div className="rounded-xl bg-black/20 p-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Received</p>
-              <p className="mt-2 text-sm font-bold text-white">{new Date(item.receivedAt).toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}</p>
+              <div className="rounded-xl border border-white/5 bg-black/20 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Financial Impact</p>
+                <p className="mt-2 text-lg font-bold text-white">{item.financialImpact ? `$${item.financialImpact.toFixed(2)}` : "Not detected"}</p>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-black/20 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Received</p>
+                <p className="mt-2 text-sm font-bold text-white">{new Date(item.receivedAt).toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}</p>
               <p className="text-xs text-stone-400">{new Date(item.receivedAt).toLocaleTimeString("en", { hour: "numeric", minute: "2-digit" })}</p>
             </div>
           </div>
@@ -244,8 +248,7 @@ export function InboxDetailView({ id }: { id: string }) {
               </div>
               <p className="text-sm leading-6 text-stone-400">{item.flaggedReason}</p>
               <div className="mt-4 pt-4 border-t border-white/5">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Ranking Factors</h3>
-                <ScoreBreakdown task={task} />
+                <ScoreBreakdown task={task} expanded />
               </div>
             </div>
             <div className="rounded-xl border border-white/10 p-5 bg-black/40">
