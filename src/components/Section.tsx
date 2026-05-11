@@ -5,12 +5,14 @@ import { useState } from "react";
 export function Section({
   title,
   action,
+  icon,
   children,
   collapsible = false,
   defaultOpen = true,
 }: {
   title: string;
   action?: React.ReactNode;
+  icon?: React.ReactNode;
   children: React.ReactNode;
   collapsible?: boolean;
   defaultOpen?: boolean;
@@ -43,6 +45,7 @@ export function Section({
               </svg>
             </button>
           )}
+          {icon && <span className="shrink-0">{icon}</span>}
           <h2 className="text-xl font-extrabold text-white tracking-tight">{title}</h2>
         </div>
         {action}

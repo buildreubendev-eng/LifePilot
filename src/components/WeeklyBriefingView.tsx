@@ -7,6 +7,18 @@ import { ConflictAlert } from "@/components/ConflictAlert";
 import { EmptyState } from "@/components/EmptyState";
 import { fetchJson } from "@/lib/apiClient";
 import type { BriefingSummary } from "@/lib/types";
+import {
+  FileText,
+  AlertTriangle,
+  Calendar,
+  DollarSign,
+  RefreshCw,
+  CheckCircle2,
+  Clock,
+  Shield,
+  Lightbulb,
+  TrendingUp,
+} from "lucide-react";
 
 export function WeeklyBriefingView() {
   const [briefing, setBriefing] = useState<BriefingSummary | null>(null);
@@ -15,37 +27,26 @@ export function WeeklyBriefingView() {
 
   useEffect(() => {
     let active = true;
-
     async function loadBriefing() {
       try {
         const body = await fetchJson<{ briefing: BriefingSummary }>("/api/life-admin/briefing");
-        if (active) {
-          setBriefing(body.briefing);
-          setError(null);
-        }
+        if (active) { setBriefing(body.briefing); setError(null); }
       } catch (loadError) {
-        if (active) {
-          setError(loadError instanceof Error ? loadError.message : "Unable to load briefing");
-        }
+        if (active) setError(loadError instanceof Error ? loadError.message : "Unable to load briefing");
       } finally {
-        if (active) {
-          setIsLoading(false);
-        }
+        if (active) setIsLoading(false);
       }
     }
-
     void loadBriefing();
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, []);
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-white/10 border-t-stone-900" />
-          <p className="mt-4 text-sm font-semibold text-stone-400">Generating your weekly briefing...</p>
+      <div className="flex min-h-[60vh] items-center justify-center py-20">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-500" />
+          <p className="tracking-widest uppercase text-stone-500 text-sm font-semibold">Generating Executive Briefing</p>
         </div>
       </div>
     );
@@ -53,38 +54,97 @@ export function WeeklyBriefingView() {
 
   if (error) {
     return (
-      <div>
-        <section className="py-4">
-          <h1 className="text-4xl font-black text-white">Weekly Briefing</h1>
+      <div className="animate-fade-in pb-20">
+        <section className="py-4 mb-8">
+          <h1 className="text-4xl font-extrabold text-white tracking-tight">Executive Briefing</h1>
         </section>
-        <div className="rounded-md bg-red-100 px-3 py-2 text-sm font-semibold text-red-800">{error}</div>
+        <div className="rounded-lg bg-red-950/50 border border-red-500/30 px-4 py-3 text-sm font-medium text-red-200">{error}</div>
       </div>
     );
   }
 
-  if (!briefing) {
-    return null;
-  }
+  if (!briefing) return null;
+
+  const totalAttention = briefing.attentionThisWeek.length + briefing.overdueItems.length;
+  const totalFinancial = briefing.upcomingBills.length + briefing.renewingSubscriptions.length;
 
   return (
-    <div>
-      <section className="py-4">
-        <h1 className="text-4xl font-black text-white">Weekly Briefing</h1>
-        <p className="mt-3 max-w-3xl text-base leading-7 text-stone-400">
-          A calm summary of what needs attention, what can wait, and where PLOS recommends action.
-        </p>
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-2">
-        {briefing.recommendedActions.map((action) => (
-          <div key={action} className="rounded-lg border border-white/10 bg-black/40 p-4 shadow-sm">
-            <p className="text-sm font-semibold text-white">{action}</p>
+    <div className="animate-fade-in pb-20">
+      {/* Hero */}
+      <section className="py-4 mb-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="text-4xl font-extrabold text-white tracking-tight">Executive Briefing</h1>
+            <p className="mt-3 max-w-3xl text-lg font-light leading-7 text-stone-400">
+              A calm summary of what needs attention, what can wait, and where PLOS recommends action.
+            </p>
           </div>
-        ))}
+          <div className="shrink-0 flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-stone-400">
+            <Calendar size={14} />
+            {new Date().toLocaleDateString("en", { weekday: "long", month: "long", day: "numeric" })}
+          </div>
+        </div>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Section title="Needs Attention This Week">
+      {/* Quick Stats Strip */}
+      <div className="mb-10 grid gap-4 grid-cols-2 lg:grid-cols-5">
+        <div className="rounded-2xl border border-white/5 bg-black/40 p-4 backdrop-blur-md">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle size={14} className="text-amber-400" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-stone-500">Attention</span>
+          </div>
+          <p className="text-2xl font-extrabold text-white tabular-nums">{totalAttention}</p>
+        </div>
+        <div className="rounded-2xl border border-white/5 bg-black/40 p-4 backdrop-blur-md">
+          <div className="flex items-center gap-2 mb-2">
+            <Clock size={14} className="text-red-400" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-stone-500">Overdue</span>
+          </div>
+          <p className="text-2xl font-extrabold text-white tabular-nums">{briefing.overdueItems.length}</p>
+        </div>
+        <div className="rounded-2xl border border-white/5 bg-black/40 p-4 backdrop-blur-md">
+          <div className="flex items-center gap-2 mb-2">
+            <DollarSign size={14} className="text-emerald-400" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-stone-500">Financial</span>
+          </div>
+          <p className="text-2xl font-extrabold text-white tabular-nums">{totalFinancial}</p>
+        </div>
+        <div className="rounded-2xl border border-white/5 bg-black/40 p-4 backdrop-blur-md">
+          <div className="flex items-center gap-2 mb-2">
+            <Shield size={14} className="text-violet-400" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-stone-500">Conflicts</span>
+          </div>
+          <p className="text-2xl font-extrabold text-white tabular-nums">{briefing.scheduleConflicts.length}</p>
+        </div>
+        <div className="rounded-2xl border border-white/5 bg-black/40 p-4 backdrop-blur-md">
+          <div className="flex items-center gap-2 mb-2">
+            <FileText size={14} className="text-blue-400" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-stone-500">Documents</span>
+          </div>
+          <p className="text-2xl font-extrabold text-white tabular-nums">{briefing.documentsToSave.length}</p>
+        </div>
+      </div>
+
+      {/* Recommended Actions Banner */}
+      {briefing.recommendedActions.length > 0 && (
+        <div className="mb-10 rounded-2xl border border-emerald-500/20 bg-emerald-950/10 p-6 backdrop-blur-md">
+          <div className="flex items-center gap-2 mb-4">
+            <Lightbulb size={16} className="text-emerald-400" />
+            <h2 className="text-sm font-bold text-emerald-300 uppercase tracking-widest">Recommended Actions</h2>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {briefing.recommendedActions.map((action) => (
+              <div key={action} className="flex items-start gap-2 rounded-xl border border-emerald-500/10 bg-black/20 p-3">
+                <TrendingUp size={12} className="shrink-0 mt-0.5 text-emerald-400" />
+                <p className="text-sm font-medium text-stone-300">{action}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        <Section title="Needs Attention This Week" icon={<AlertTriangle size={16} className="text-amber-400" />}>
           <div className="grid gap-3">
             {briefing.attentionThisWeek.length === 0 ? (
               <EmptyState title="Nothing urgent" copy="Your week looks manageable." icon="success" />
@@ -95,7 +155,8 @@ export function WeeklyBriefingView() {
             )}
           </div>
         </Section>
-        <Section title="Overdue Items">
+
+        <Section title="Overdue Items" icon={<Clock size={16} className="text-red-400" />}>
           <div className="grid gap-3">
             {briefing.overdueItems.length === 0 ? (
               <EmptyState title="Nothing overdue" copy="No overdue items right now." icon="success" />
@@ -104,7 +165,8 @@ export function WeeklyBriefingView() {
             )}
           </div>
         </Section>
-        <Section title="Upcoming Bills">
+
+        <Section title="Upcoming Bills" icon={<DollarSign size={16} className="text-emerald-400" />}>
           <div className="grid gap-3">
             {briefing.upcomingBills.length === 0 ? (
               <EmptyState title="No upcoming bills" copy="No bills due soon." icon="success" />
@@ -115,7 +177,8 @@ export function WeeklyBriefingView() {
             )}
           </div>
         </Section>
-        <Section title="Subscriptions Renewing Soon">
+
+        <Section title="Subscriptions Renewing" icon={<RefreshCw size={16} className="text-violet-400" />}>
           <div className="grid gap-3">
             {briefing.renewingSubscriptions.length === 0 ? (
               <EmptyState title="No renewals" copy="No subscriptions are renewing soon." icon="success" />
@@ -128,7 +191,7 @@ export function WeeklyBriefingView() {
         </Section>
       </div>
 
-      <Section title="Schedule Conflicts">
+      <Section title="Schedule Conflicts" icon={<Calendar size={16} className="text-blue-400" />}>
         {briefing.scheduleConflicts.length === 0 ? (
           <EmptyState title="Schedule clear" copy="Your schedule is clear of conflicts." icon="success" />
         ) : (
@@ -140,7 +203,7 @@ export function WeeklyBriefingView() {
         )}
       </Section>
 
-      <Section title="Documents That Should Be Saved">
+      <Section title="Documents To Save" icon={<FileText size={16} className="text-blue-400" />}>
         {briefing.documentsToSave.length === 0 ? (
           <EmptyState title="All documents saved" copy="No documents need saving right now." icon="documents" />
         ) : (

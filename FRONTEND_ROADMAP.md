@@ -48,6 +48,14 @@ This roadmap is for UI behavior, workflow polish, responsive quality, and demo u
 - ✅ Fix SettingsView dark theme consistency (approval rules badges, error messages, category toggles, reset button — all converted to dark executive theme).
 - ✅ Fix all remaining light-mode badge artifacts across DocumentsView, ApprovalsView, and SettingsView.
 
+## Phase 5: Final Polish & Consistency ✅
+
+- ✅ Overhaul ActivityView into a proper Audit Trail — timeline UI with vertical line and dots, event-type icons and color-coded badges, expandable detail panel per event showing metadata, relative timestamps ("5m ago"), filter pills with icons.
+- ✅ Overhaul WeeklyBriefingView into Executive Briefing — quick stats strip (Attention/Overdue/Financial/Conflicts/Documents), recommended actions banner with TrendingUp icons, section-level icons, date badge, consistent dark theme.
+- ✅ Add icon prop to Section component for visual category indicators on section headers.
+- ✅ Fix LearningPreferencesPanel — dark theme with lucide icons (Brain/Sparkles/FileText), interactive card layout with hover states.
+- ✅ Fix PrivacyPanel — replaced light-mode emerald-50 background with dark emerald-950/10, replaced inline SVGs with lucide icons (Lock/Shield/CheckSquare/Ban), fixed invalid `bg-black/40/60` class.
+
 ## Quality Gates
 
 - `npm run typecheck`
