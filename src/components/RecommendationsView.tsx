@@ -7,6 +7,7 @@ import { Section } from "@/components/Section";
 import { fetchJson } from "@/lib/apiClient";
 import type { ActionRecommendation, RecommendationAcceptResult } from "@/lib/types";
 import { CheckCircle2, ShieldAlert, FileText, ListTodo, Sparkles } from "lucide-react";
+import { GenericSkeleton } from "@/components/Skeleton";
 
 export function RecommendationsView() {
   const [recommendations, setRecommendations] = useState<ActionRecommendation[]>([]);
@@ -78,14 +79,7 @@ export function RecommendationsView() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center py-20">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-500" />
-          <p className="tracking-widest uppercase text-stone-500 text-sm font-semibold">Loading Recommendations</p>
-        </div>
-      </div>
-    );
+    return <GenericSkeleton />;
   }
 
   return (

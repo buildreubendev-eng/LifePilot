@@ -9,6 +9,7 @@ import { TaskModal } from "@/components/TaskModal";
 import { fetchJson } from "@/lib/apiClient";
 import type { LifeAdminTask, ManualTask } from "@/lib/types";
 import { Plus, ListTodo, CheckSquare, Layers } from 'lucide-react';
+import { TasksSkeleton } from '@/components/Skeleton';
 
 type StatusFilter = "active" | "completed" | "all";
 
@@ -77,14 +78,7 @@ export function TasksView() {
   const urgentTasks = activeTasks.filter((t) => t.priority === "urgent" || t.priority === "high");
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center py-20">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-500" />
-          <p className="tracking-widest uppercase text-stone-500 text-sm font-semibold">Loading Tasks</p>
-        </div>
-      </div>
-    );
+    return <TasksSkeleton />;
   }
 
   return (

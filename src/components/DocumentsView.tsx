@@ -8,6 +8,7 @@ import { Section } from "@/components/Section";
 import { fetchJson } from "@/lib/apiClient";
 import type { DocumentRecord, LifeAdminCategory } from "@/lib/types";
 import { usePlosStore } from "@/lib/usePlosStore";
+import { GenericSkeleton } from "@/components/Skeleton";
 
 const categoryColors: Record<string, string> = {
   bill: "bg-rose-500/10 text-rose-400 border-rose-500/20",
@@ -114,14 +115,7 @@ export function DocumentsView() {
   }, []);
 
   if (isLoading || itemsLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center py-20">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-500" />
-          <p className="tracking-widest uppercase text-stone-500 text-sm font-semibold">Loading Documents</p>
-        </div>
-      </div>
-    );
+    return <GenericSkeleton />;
   }
 
   return (

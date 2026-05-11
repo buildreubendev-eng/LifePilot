@@ -12,6 +12,7 @@ import { usePlosStore } from "@/lib/usePlosStore";
 import { RingProgress, Group, Text, Stack, Paper, Center } from '@mantine/core';
 import { AreaChart } from '@mantine/charts';
 import { ChevronRight, TrendingUp, AlertCircle, CheckCircle2, RefreshCw, Clock, Inbox, FileText } from 'lucide-react';
+import { DashboardSkeleton } from '@/components/Skeleton';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -120,14 +121,7 @@ export function DashboardView() {
   };
 
   if (isLoading || itemsLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center py-20">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-500" />
-          <Text c="dimmed" size="sm" fw={500} className="tracking-widest uppercase">Initializing Executive Overview</Text>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (

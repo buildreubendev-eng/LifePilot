@@ -25,6 +25,7 @@ import {
   Settings2,
   Activity,
 } from "lucide-react";
+import { IntegrationsSkeleton } from "@/components/Skeleton";
 
 const statusOptions: IntegrationStatus[] = ["not_connected", "connected", "paused", "error"];
 
@@ -146,14 +147,7 @@ export function IntegrationsView() {
     : 0;
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center py-20">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-500" />
-          <p className="tracking-widest uppercase text-stone-500 text-sm font-semibold">Loading Integrations</p>
-        </div>
-      </div>
-    );
+    return <IntegrationsSkeleton />;
   }
 
   return (

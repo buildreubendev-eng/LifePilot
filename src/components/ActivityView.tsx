@@ -21,6 +21,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { GenericSkeleton } from "@/components/Skeleton";
 
 type EventTypeFilter = "all" | "status_change" | "save_document" | "create_task" | "approval" | "settings" | "integration" | "ingestion";
 
@@ -100,14 +101,7 @@ export function ActivityView() {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center py-20">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-500" />
-          <p className="tracking-widest uppercase text-stone-500 text-sm font-semibold">Loading Audit Trail</p>
-        </div>
-      </div>
-    );
+    return <GenericSkeleton />;
   }
 
   return (

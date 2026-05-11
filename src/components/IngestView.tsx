@@ -22,6 +22,7 @@ import {
   ArrowRight,
   Eye,
 } from "lucide-react";
+import { GenericSkeleton } from "@/components/Skeleton";
 
 const providers: RawMessageProvider[] = ["gmail", "google-calendar", "plaid", "health", "manual"];
 
@@ -100,14 +101,7 @@ export function IngestView() {
   const failedRuns = runs.filter((r) => r.status === "failed").length;
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center py-20">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-500" />
-          <p className="tracking-widest uppercase text-stone-500 text-sm font-semibold">Loading Ingestion Data</p>
-        </div>
-      </div>
-    );
+    return <GenericSkeleton />;
   }
 
   return (

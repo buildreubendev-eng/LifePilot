@@ -9,6 +9,7 @@ import { Section } from "@/components/Section";
 import type { LifeAdminCategory, LifeAdminStatus } from "@/lib/types";
 import { usePlosStore } from "@/lib/usePlosStore";
 import { RefreshCw, Search } from 'lucide-react';
+import { InboxSkeleton } from '@/components/Skeleton';
 
 type StatusFilter = LifeAdminStatus | "all";
 
@@ -91,14 +92,7 @@ export function InboxView() {
   ];
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center py-20">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-500" />
-          <p className="tracking-widest uppercase text-stone-500 text-sm font-semibold">Loading Inbox</p>
-        </div>
-      </div>
-    );
+    return <InboxSkeleton />;
   }
 
   return (

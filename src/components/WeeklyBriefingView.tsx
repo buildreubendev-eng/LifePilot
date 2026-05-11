@@ -19,6 +19,7 @@ import {
   Lightbulb,
   TrendingUp,
 } from "lucide-react";
+import { GenericSkeleton } from "@/components/Skeleton";
 
 export function WeeklyBriefingView() {
   const [briefing, setBriefing] = useState<BriefingSummary | null>(null);
@@ -42,14 +43,7 @@ export function WeeklyBriefingView() {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center py-20">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-emerald-500" />
-          <p className="tracking-widest uppercase text-stone-500 text-sm font-semibold">Generating Executive Briefing</p>
-        </div>
-      </div>
-    );
+    return <GenericSkeleton />;
   }
 
   if (error) {

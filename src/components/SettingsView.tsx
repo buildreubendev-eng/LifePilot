@@ -9,6 +9,7 @@ import { LearningPreferencesPanel } from "@/components/LearningPreferencesPanel"
 import { BriefingPreferencesPanel } from "@/components/BriefingPreferencesPanel";
 import { Checkbox } from "@/components/ui/checkbox";
 import { usePlosStore } from "@/lib/usePlosStore";
+import { GenericSkeleton } from "@/components/Skeleton";
 
 const sensitiveCategories: LifeAdminCategory[] = ["medical", "bill", "school/family", "personal reply"];
 
@@ -73,14 +74,7 @@ export function SettingsView() {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-white/10 border-t-stone-900" />
-          <p className="mt-4 text-sm font-semibold text-stone-400">Loading settings...</p>
-        </div>
-      </div>
-    );
+    return <GenericSkeleton />;
   }
 
   return (

@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { BackendStatusPill } from "@/components/BackendStatusPill";
-import { Shield } from 'lucide-react';
+import { KeyboardShortcutOverlay } from "@/components/KeyboardShortcutOverlay";
+import { useKeyboardShortcuts } from "@/lib/useKeyboardShortcuts";
+import { Shield, Keyboard } from 'lucide-react';
 
 const navigation = [
   {
@@ -143,6 +145,7 @@ const sectionLabels: Record<string, string> = {
 export function AppFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { showOverlay, setShowOverlay, pendingPrefix } = useKeyboardShortcuts();
 
   const sections = [...new Set(navigation.map((n) => n.section))];
 
@@ -219,6 +222,17 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
 
         <div className="border-t border-white/5 px-4 py-3">
           <BackendStatusPill />
+          <button
+            type="button"
+            onClick={() => setShowOverlay(true)}
+            className="mt-2 flex w-full items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-[10px] text-stone-500 transition-colors hover:bg-white/[0.04] hover:text-stone-400"
+          >
+            <span className="flex items-center gap-1.5">
+              <Keyboard size={12} />
+              Shortcuts
+            </span>
+            <kbd className="rounded bg-white/5 border border-white/10 px-1.5 py-0.5 font-mono text-[9px]">?</kbd>
+          </button>
           <div className="mt-2 rounded-lg border border-emerald-500/20 bg-emerald-950/30 px-3 py-2.5 text-center">
             <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">
               Mock Data Demo
@@ -338,6 +352,25 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
+
+      {/* Keyboard shortcut overlay */}
+      <KeyboardShortcutOverlay
+        isOpen={showOverlay}
+        onClose={() => setShowOverlay(false)}
+        pendingPrefix={pendingPrefix}
+      />
+
+      {/* Pending prefix indicator (floating) */}
+      {pendingPrefix && !showOverlay && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 lg:bottom-6 animate-scale-in">
+          <div className="rounded-full border border-emerald-500/30 bg-black/90 backdrop-blur-xl px-4 py-2 shadow-2xl flex items-center gap-2">
+            <kbd className="rounded bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 text-xs font-mono font-bold text-emerald-300">
+              {pendingPrefix.toUpperCase()}
+            </kbd>
+            <span className="text-xs text-stone-400">waiting for second key...</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

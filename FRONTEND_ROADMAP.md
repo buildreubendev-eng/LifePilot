@@ -56,6 +56,21 @@ This roadmap is for UI behavior, workflow polish, responsive quality, and demo u
 - ✅ Fix LearningPreferencesPanel — dark theme with lucide icons (Brain/Sparkles/FileText), interactive card layout with hover states.
 - ✅ Fix PrivacyPanel — replaced light-mode emerald-50 background with dark emerald-950/10, replaced inline SVGs with lucide icons (Lock/Shield/CheckSquare/Ban), fixed invalid `bg-black/40/60` class.
 
+## Phase 6: Power User UX & Perceived Performance ✅
+
+### Keyboard Shortcuts
+- ✅ Created `useKeyboardShortcuts` hook with G-prefix navigation (G→D=Dashboard, G→I=Inbox, G→T=Tasks, G→S=Suggestions, G→B=Briefing, G→O=Documents, G→A=Approvals, G→N=Integrations, G→E=Settings).
+- ✅ Created `KeyboardShortcutOverlay` component — full-screen overlay triggered by `?` key showing all shortcuts grouped by category.
+- ✅ Integrated into AppFrame with sidebar "Shortcuts" button, floating pending-prefix indicator, and overlay rendering.
+- ✅ Added `/` to focus search inputs, `Escape` to close overlays, auto-clear pending prefix after 1.5s timeout.
+- ✅ All shortcuts disabled when focus is in inputs/textareas/selects.
+
+### Skeleton Loaders
+- ✅ Created `Skeleton.tsx` with shimmer animation components: SkeletonPulse, SkeletonMetricCard, SkeletonMetrics, SkeletonItemCard, SkeletonItemGrid, SkeletonSectionHeader, SkeletonPageHeader.
+- ✅ Created view-specific skeletons: DashboardSkeleton (hero + ring + metrics + items), InboxSkeleton (search + filters + items), TasksSkeleton (metrics + filters + items), IntegrationsSkeleton (metrics + connector cards with sync strips).
+- ✅ Replaced spinner loading states across ALL 10 views: DashboardView, InboxView, TasksView, IntegrationsView, IngestView, DocumentsView, ActivityView, WeeklyBriefingView, RecommendationsView, SettingsView.
+
+
 ## Quality Gates
 
 - `npm run typecheck`
