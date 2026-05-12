@@ -117,6 +117,16 @@ This roadmap is for UI behavior, workflow polish, responsive quality, and demo u
 - ✅ Integrated all 4 charts into DashboardView as a responsive 4-column analytics grid below the metrics strip.
 - ✅ All charts use consistent dark executive theme (bg-black/40, border-white/5, backdrop-blur-md).
 
+## Phase 10: Breadcrumb Navigation ✅
+
+- ✅ Created `Breadcrumbs.tsx` — auto-derives breadcrumb trail from current pathname.
+- ✅ Route label mapping: 11 named routes (Dashboard, AI Inbox, Tasks, Suggestions, Executive Briefing, Documents, Approvals, Integrations, Ingest, Audit Trail, Settings).
+- ✅ Dynamic segment resolution: Inbox item detail pages (`/inbox/[id]`) resolve the item ID to the actual item title (truncated at 40 chars).
+- ✅ Home icon on Dashboard crumb, ChevronRight separators between crumbs.
+- ✅ Hidden on root page (Dashboard) — only shows on inner pages.
+- ✅ Integrated into AppFrame — renders globally above all page content.
+- ✅ Fully accessible: `aria-label="Breadcrumb"` on nav, `aria-current="page"` on last crumb, `aria-hidden` on decorative icons.
+
 ## Quality Gates
 
 - `npm run typecheck`

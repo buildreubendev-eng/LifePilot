@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { BackendStatusPill } from "@/components/BackendStatusPill";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CommandPalette } from "@/components/CommandPalette";
 import { KeyboardShortcutOverlay } from "@/components/KeyboardShortcutOverlay";
 import { ToastProvider } from "@/components/ToastProvider";
@@ -367,6 +368,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
       >
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 animate-fade-in">
           <ToastProvider>
+            <Breadcrumbs />
             {children}
           </ToastProvider>
         </div>
