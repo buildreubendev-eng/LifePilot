@@ -14,6 +14,7 @@ import { AreaChart } from '@mantine/charts';
 import { ChevronRight, TrendingUp, AlertCircle, CheckCircle2, RefreshCw, Clock, Inbox, FileText } from 'lucide-react';
 import { DashboardSkeleton } from '@/components/Skeleton';
 import { useToast } from '@/components/ToastProvider';
+import { CategoryDistribution, StatusDistribution, FinancialExposure, WeeklyTrend } from '@/components/DashboardAnalytics';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -237,6 +238,14 @@ export function DashboardView() {
         <MetricCard label="Overdue" value={counts.overdue} icon={<AlertCircle size={20} />} trend={counts.overdue > 0 ? "danger" : "success"} />
         <MetricCard label="Docs To Save" value={counts.documentsToSave} icon={<FileText size={20} />} />
         <MetricCard label="Suggestions" value={recommendationCount} icon={<CheckCircle2 size={20} />} trend="success" />
+      </div>
+
+      {/* Analytics Grid */}
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4 mb-10 animate-slide-up" style={{ animationDelay: '200ms' }}>
+        <CategoryDistribution items={items} />
+        <StatusDistribution items={items} />
+        <FinancialExposure items={items} />
+        <WeeklyTrend items={items} />
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr]">
