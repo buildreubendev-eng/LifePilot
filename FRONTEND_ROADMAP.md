@@ -70,6 +70,25 @@ This roadmap is for UI behavior, workflow polish, responsive quality, and demo u
 - ✅ Created view-specific skeletons: DashboardSkeleton (hero + ring + metrics + items), InboxSkeleton (search + filters + items), TasksSkeleton (metrics + filters + items), IntegrationsSkeleton (metrics + connector cards with sync strips).
 - ✅ Replaced spinner loading states across ALL 10 views: DashboardView, InboxView, TasksView, IntegrationsView, IngestView, DocumentsView, ActivityView, WeeklyBriefingView, RecommendationsView, SettingsView.
 
+## Phase 7: Command Palette & Toast Notifications ✅
+
+### Command Palette (⌘K)
+- ✅ Created `CommandPalette.tsx` — full command palette with fuzzy search across navigation pages and inbox items.
+- ✅ Keyboard navigable (↑↓ Arrow Keys + Enter to select, Escape to close).
+- ✅ Grouped results: "Pages" (11 navigation targets) and "Inbox Items" (up to 30 searchable items with sender/category).
+- ✅ Auto-focuses search input on open, scrolls selected result into view.
+- ✅ Added ⌘K / Ctrl+K shortcut to `useKeyboardShortcuts` hook — works even when focused in inputs.
+- ✅ Added "Search..." button with ⌘K hint in sidebar footer.
+- ✅ Footer shows keyboard navigation hints (↑↓ navigate, ⏎ open, esc close).
+
+### Toast Notification System
+- ✅ Created `ToastProvider.tsx` — context-based toast system with `useToast()` hook.
+- ✅ 4 variants: success (emerald), error (red), warning (amber), info (blue) — each with icon, border, and background.
+- ✅ Auto-dismiss: 4s for success/info/warning, 6s for errors. Manual dismiss via X button.
+- ✅ Max 5 toasts visible, stacked in bottom-right corner with slide-up animation and backdrop blur.
+- ✅ `aria-live="polite"` + `role="alert"` for accessibility.
+- ✅ Migrated DashboardView and InboxView from inline notice banners to toast notifications.
+- ✅ Wrapped main content area with `ToastProvider` in AppFrame.
 
 ## Quality Gates
 

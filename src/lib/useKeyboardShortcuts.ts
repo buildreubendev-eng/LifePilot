@@ -26,6 +26,7 @@ export const shortcutGroups: ShortcutGroup[] = [
   {
     title: "Quick Actions",
     shortcuts: [
+      { key: "⌘K", label: "⌘K", description: "Open command palette" },
       { key: "?", label: "?", description: "Toggle shortcut overlay" },
       { key: "Escape", label: "Esc", description: "Close overlay / Deselect" },
       { key: "/", label: "/", description: "Focus search (when available)" },
@@ -48,10 +49,20 @@ const navigationMap: Record<string, string> = {
 export function useKeyboardShortcuts() {
   const router = useRouter();
   const [showOverlay, setShowOverlay] = useState(false);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [pendingPrefix, setPendingPrefix] = useState<string | null>(null);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      // ⌘K / Ctrl+K always opens command palette (even in inputs)
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setShowCommandPalette((prev) => !prev);
+        setShowOverlay(false);
+        setPendingPrefix(null);
+        return;
+      }
+
       // Don't capture when typing in inputs/textareas/selects
       const target = e.target as HTMLElement;
       if (
@@ -63,17 +74,19 @@ export function useKeyboardShortcuts() {
         return;
       }
 
-      // Escape closes overlay
+      // Escape closes overlays
       if (e.key === "Escape") {
         setShowOverlay(false);
+        setShowCommandPalette(false);
         setPendingPrefix(null);
         return;
       }
 
-      // ? toggles overlay
+      // ? toggles shortcut overlay
       if (e.key === "?" && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         setShowOverlay((prev) => !prev);
+        setShowCommandPalette(false);
         return;
       }
 
@@ -119,6 +132,8 @@ export function useKeyboardShortcuts() {
   return {
     showOverlay,
     setShowOverlay,
+    showCommandPalette,
+    setShowCommandPalette,
     pendingPrefix,
   };
 }

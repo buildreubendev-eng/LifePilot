@@ -13,6 +13,7 @@ import { RingProgress, Group, Text, Stack, Paper, Center } from '@mantine/core';
 import { AreaChart } from '@mantine/charts';
 import { ChevronRight, TrendingUp, AlertCircle, CheckCircle2, RefreshCw, Clock, Inbox, FileText } from 'lucide-react';
 import { DashboardSkeleton } from '@/components/Skeleton';
+import { useToast } from '@/components/ToastProvider';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -34,7 +35,7 @@ export function DashboardView() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDashboardRefreshing, setIsDashboardRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   const loadDashboard = useCallback(async (showRefreshing = true) => {
     if (showRefreshing) {
@@ -97,15 +98,13 @@ export function DashboardView() {
 
   async function refreshDashboard() {
     await Promise.all([loadDashboard(), refreshItems()]);
-    setNotice("Dashboard refreshed.");
-    window.setTimeout(() => setNotice(null), 3000);
+    addToast("Dashboard refreshed.", "success");
   }
 
   async function resetDemoData() {
     const ok = await resetStatuses();
     await Promise.all([loadDashboard(), refreshItems()]);
-    setNotice(ok ? "Demo data reset." : "Reset attempted. Check the error message above.");
-    window.setTimeout(() => setNotice(null), 3500);
+    addToast(ok ? "Demo data reset." : "Reset attempted. Check the error message above.", ok ? "success" : "warning");
   }
 
   const score = dashboard?.lifeAdminScore ?? 0;
@@ -128,9 +127,6 @@ export function DashboardView() {
     <div className="animate-fade-in pb-20">
       {error ? (
         <div className="mb-6 rounded-lg bg-red-950/50 border border-red-500/30 px-4 py-3 text-sm font-medium text-red-200">{error}</div>
-      ) : null}
-      {notice ? (
-        <div className="mb-6 rounded-lg border border-emerald-500/30 bg-emerald-950/30 px-4 py-3 text-sm font-medium text-emerald-200">{notice}</div>
       ) : null}
 
       {/* Hero Section: Executive Dashboard */}

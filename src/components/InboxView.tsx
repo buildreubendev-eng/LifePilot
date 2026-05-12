@@ -10,6 +10,7 @@ import type { LifeAdminCategory, LifeAdminStatus } from "@/lib/types";
 import { usePlosStore } from "@/lib/usePlosStore";
 import { RefreshCw, Search } from 'lucide-react';
 import { InboxSkeleton } from '@/components/Skeleton';
+import { useToast } from '@/components/ToastProvider';
 
 type StatusFilter = LifeAdminStatus | "all";
 
@@ -21,7 +22,7 @@ export function InboxView() {
   const [isBatchMode, setIsBatchMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [batchProcessing, setBatchProcessing] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   const handleToggleBatchMode = () => {
     setIsBatchMode(!isBatchMode);
@@ -47,8 +48,7 @@ export function InboxView() {
     setBatchProcessing(false);
     setIsBatchMode(false);
     setSelectedIds(new Set());
-    setNotice(`Updated ${ids.length} item${ids.length === 1 ? "" : "s"} to ${nextStatus}.`);
-    window.setTimeout(() => setNotice(null), 3500);
+    addToast(`Updated ${ids.length} item${ids.length === 1 ? "" : "s"} to ${nextStatus}.`, "success");
   };
 
   const handleSelectVisible = () => {
@@ -65,8 +65,7 @@ export function InboxView() {
   const handleResetDemoData = async () => {
     const ok = await resetStatuses();
     setSelectedIds(new Set());
-    setNotice(ok ? "Demo data reset." : "Reset attempted. Check the error message above.");
-    window.setTimeout(() => setNotice(null), 3500);
+    addToast(ok ? "Demo data reset." : "Reset attempted.", ok ? "success" : "warning");
   };
 
   const normalizedQuery = query.trim().toLowerCase();
@@ -117,7 +116,6 @@ export function InboxView() {
       </section>
 
       {error ? <div className="mb-6 rounded-lg bg-red-950/50 border border-red-500/30 px-4 py-3 text-sm font-medium text-red-200">{error}</div> : null}
-      {notice ? <div className="mb-6 rounded-lg border border-emerald-500/30 bg-emerald-950/30 px-4 py-3 text-sm font-medium text-emerald-200">{notice}</div> : null}
       
       <div className="mb-8 grid gap-5 rounded-2xl border border-white/5 bg-black/40 p-6 shadow-2xl backdrop-blur-xl">
         <label className="grid gap-2 relative">

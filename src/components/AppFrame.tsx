@@ -4,9 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { BackendStatusPill } from "@/components/BackendStatusPill";
+import { CommandPalette } from "@/components/CommandPalette";
 import { KeyboardShortcutOverlay } from "@/components/KeyboardShortcutOverlay";
+import { ToastProvider } from "@/components/ToastProvider";
 import { useKeyboardShortcuts } from "@/lib/useKeyboardShortcuts";
-import { Shield, Keyboard } from 'lucide-react';
+import { Shield, Keyboard, Search } from 'lucide-react';
 
 const navigation = [
   {
@@ -145,7 +147,7 @@ const sectionLabels: Record<string, string> = {
 export function AppFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { showOverlay, setShowOverlay, pendingPrefix } = useKeyboardShortcuts();
+  const { showOverlay, setShowOverlay, showCommandPalette, setShowCommandPalette, pendingPrefix } = useKeyboardShortcuts();
 
   const sections = [...new Set(navigation.map((n) => n.section))];
 
@@ -224,8 +226,19 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
           <BackendStatusPill />
           <button
             type="button"
+            onClick={() => setShowCommandPalette(true)}
+            className="mt-2 flex w-full items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5 text-[10px] text-stone-500 transition-colors hover:bg-white/[0.04] hover:text-stone-400"
+          >
+            <span className="flex items-center gap-1.5">
+              <Search size={12} />
+              Search...
+            </span>
+            <kbd className="rounded bg-white/5 border border-white/10 px-1.5 py-0.5 font-mono text-[9px]">⌘K</kbd>
+          </button>
+          <button
+            type="button"
             onClick={() => setShowOverlay(true)}
-            className="mt-2 flex w-full items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-[10px] text-stone-500 transition-colors hover:bg-white/[0.04] hover:text-stone-400"
+            className="mt-1.5 flex w-full items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-[10px] text-stone-500 transition-colors hover:bg-white/[0.04] hover:text-stone-400"
           >
             <span className="flex items-center gap-1.5">
               <Keyboard size={12} />
@@ -349,9 +362,17 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
         className="min-h-screen pt-14 pb-20 lg:pt-0 lg:pb-0 lg:pl-[260px] relative z-10"
       >
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 animate-fade-in">
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </div>
       </main>
+
+      {/* Command palette */}
+      <CommandPalette
+        isOpen={showCommandPalette}
+        onClose={() => setShowCommandPalette(false)}
+      />
 
       {/* Keyboard shortcut overlay */}
       <KeyboardShortcutOverlay
@@ -361,7 +382,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
       />
 
       {/* Pending prefix indicator (floating) */}
-      {pendingPrefix && !showOverlay && (
+      {pendingPrefix && !showOverlay && !showCommandPalette && (
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 lg:bottom-6 animate-scale-in">
           <div className="rounded-full border border-emerald-500/30 bg-black/90 backdrop-blur-xl px-4 py-2 shadow-2xl flex items-center gap-2">
             <kbd className="rounded bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 text-xs font-mono font-bold text-emerald-300">
