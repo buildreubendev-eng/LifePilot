@@ -27,7 +27,7 @@ export function CategoryFilter({
   compact?: boolean;
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
       {categories.map((category) => (
         <button
           key={category}

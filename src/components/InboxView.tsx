@@ -139,7 +139,7 @@ export function InboxView() {
           </div>
           <div className="grid gap-2">
             <span className="text-xs font-bold uppercase tracking-[0.2em] text-stone-500">Status</span>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by status">
               {statusOptions.map((option) => (
                 <button
                   key={option.value}

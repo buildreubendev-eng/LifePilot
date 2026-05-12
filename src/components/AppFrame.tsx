@@ -200,6 +200,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
                       <Link
                         key={item.href}
                         href={item.href}
+                        aria-current={active ? "page" : undefined}
                         className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
                           active
                             ? "bg-white/10 text-white shadow-sm border border-white/5"
@@ -207,6 +208,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
                         }`}
                       >
                         <span
+                          aria-hidden="true"
                           className={`shrink-0 transition-colors ${
                             active ? "text-emerald-400" : "text-stone-500 group-hover:text-stone-300"
                           }`}
@@ -258,9 +260,9 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Mobile header */}
-      <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-black/80 backdrop-blur-xl lg:hidden">
+      <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-black/80 backdrop-blur-xl lg:hidden" aria-label="Mobile navigation">
         <div className="flex h-14 items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2" aria-label="PLOS Dashboard home">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20 border border-emerald-500/30">
               <Shield size={16} className="text-emerald-400" />
             </div>
@@ -270,7 +272,8 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-400 hover:bg-white/10 hover:text-white transition-colors"
-            aria-label="Toggle menu"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -341,14 +344,15 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={active ? "page" : undefined}
                 className={`flex flex-col items-center gap-0.5 rounded-lg px-3 py-2 min-h-[44px] min-w-[44px] text-[10px] font-semibold transition ${
                   active ? "text-white" : "text-stone-500"
                 }`}
               >
-                <span className={active ? "text-emerald-400" : ""}>{item.icon}</span>
+                <span className={active ? "text-emerald-400" : ""} aria-hidden="true">{item.icon}</span>
                 {item.label === "Weekly Briefing" ? "Briefing" : item.label}
                 {active && (
-                  <span className="h-1 w-4 rounded-full bg-emerald-500" />
+                  <span className="h-1 w-4 rounded-full bg-emerald-500" aria-hidden="true" />
                 )}
               </Link>
             );

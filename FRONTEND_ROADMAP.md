@@ -90,6 +90,23 @@ This roadmap is for UI behavior, workflow polish, responsive quality, and demo u
 - ✅ Migrated DashboardView and InboxView from inline notice banners to toast notifications.
 - ✅ Wrapped main content area with `ToastProvider` in AppFrame.
 
+## Phase 8: Accessibility Audit ✅
+
+### ARIA Labels & Landmarks
+- ✅ `CategoryFilter` — added `role="group"` and `aria-label="Filter by category"`.
+- ✅ `ItemCard` — added `aria-label` to selectable buttons (dynamic Select/Deselect), `aria-pressed` state, and `aria-label` on card links.
+- ✅ `TaskActionCard` — added `role="article"`, `aria-label` on all action buttons, `aria-expanded` and `aria-label` on expand toggle.
+- ✅ `Section` — added `aria-labelledby` linking to heading, `aria-expanded` + `aria-controls` on collapsible toggle, `aria-hidden` on decorative icons, `useId()` for unique heading IDs.
+- ✅ `InboxView` — added `role="group"` and `aria-label="Filter by status"` to status filter group.
+- ✅ `AppFrame` sidebar — added `aria-current="page"` to active nav links, `aria-hidden="true"` on decorative icon spans.
+- ✅ `AppFrame` mobile header — added `aria-label="Mobile navigation"`, contextual `aria-label` on menu toggle (Open/Close), `aria-expanded` state, `aria-label="PLOS Dashboard home"` on logo link.
+- ✅ `AppFrame` mobile tab bar — added `aria-current="page"`, `aria-hidden` on icons and active indicator dot.
+
+### Motion & Visual Accessibility
+- ✅ Added `@media (prefers-reduced-motion: reduce)` in globals.css — disables all animations and transitions for users with vestibular sensitivities.
+- ✅ Added `.sr-only` utility class for screen-reader-only text.
+- ✅ Existing: `*:focus-visible` ring (emerald), skip-to-content link, 44px minimum tap targets.
+
 ## Quality Gates
 
 - `npm run typecheck`

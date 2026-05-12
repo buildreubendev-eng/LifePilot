@@ -119,6 +119,8 @@ export function TaskActionCard({
           ? "bg-white/[0.02] border-white/5 opacity-70"
           : "bg-black/40 border-white/5 hover:border-white/20 hover:bg-black/60 hover:shadow-2xl"
       }`}
+      role="article"
+      aria-label={`Task: ${task.title}`}
     >
       {/* Header row */}
       <div className="flex items-start justify-between gap-2">
@@ -158,6 +160,8 @@ export function TaskActionCard({
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
               className="flex items-center gap-1 text-xs text-stone-500 hover:text-stone-300 transition-colors"
+              aria-expanded={isExpanded}
+              aria-label={isExpanded ? 'Collapse score details' : 'Expand score details'}
             >
               {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
               Details
@@ -211,6 +215,7 @@ export function TaskActionCard({
             disabled={processing}
             onClick={() => void handleStatusChange(action.status)}
             className={`inline-flex items-center justify-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5 min-h-[40px] text-xs font-bold text-stone-400 transition-all disabled:opacity-40 ${action.hoverColor}`}
+            aria-label={`${action.label} task: ${task.title}`}
           >
             {action.icon}
             {action.label}

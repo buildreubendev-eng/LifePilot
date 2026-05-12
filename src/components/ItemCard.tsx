@@ -82,14 +82,14 @@ export function ItemCard({
 
   if (selectable) {
     return (
-      <button type="button" onClick={onToggle} className={containerClasses}>
+      <button type="button" onClick={onToggle} className={containerClasses} aria-label={`${selected ? 'Deselect' : 'Select'} ${source.title}`} aria-pressed={selected}>
         {innerContent}
       </button>
     );
   }
 
   return (
-    <Link href={href} className={containerClasses}>
+    <Link href={href} className={containerClasses} aria-label={`View ${source.title}`}>
       {innerContent}
     </Link>
   );
